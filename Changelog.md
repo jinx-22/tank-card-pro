@@ -2,6 +2,12 @@
 
 All notable changes to **Tank Card** are documented here.
 
+## [0.9.3] - 2026-10-26
+
+switch from "Tank Card" to "Tank Card Pro"
+
+### Added
+
 ---
 
 ## [0.9.2] - 2026-10-16
