@@ -1,6 +1,6 @@
 {
-  "name": "Tank Card",
-  "filename": "tank-card.js",
+  "name": "Tank Card Pro",
+  "filename": "tank-card-pro.js",
   "homeassistant": "2024.10.0",
   "render_readme": true
 }
