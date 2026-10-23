@@ -1,11 +1,12 @@
-# Tank Card – Tankfüllstands-Visualisierung
+# Tank Card Pro – Tankfüllstands-Visualisierung
+(Tank Card Pro entwicklung basiert auf Tank Card v0.9.2)
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-![GitHub total downloads](https://img.shields.io/github/downloads/jinx-22/tank-card/total?style=flat-square&color=red)
-[![GitHub release](https://img.shields.io/github/release/jinx-22/tank-card?include_prereleases=&sort=semver&color=blue)](https://github.com/jinx-22/tank-card/releases/)
-![File size](https://img.shields.io/github/size/jinx-22/tank-card/tank-card.js?label=Card%20Size)
-![last commit](https://img.shields.io/github/last-commit/jinx-22/tank-card)
-[![stars](https://img.shields.io/github/stars/jinx-22/tank-card)](https://github.com/jinx-22/tank-card/stargazers)
+![GitHub total downloads](https://img.shields.io/github/downloads/jinx-22/tank-card-pro/total?style=flat-square&color=red)
+[![GitHub release](https://img.shields.io/github/release/jinx-22/tank-card-pro?include_prereleases=&sort=semver&color=blue)](https://github.com/jinx-22/tank-card-pro/releases/)
+![File size](https://img.shields.io/github/size/jinx-22/tank-card-pro/tank-card-pro.js?label=Card%20Size)
+![last commit](https://img.shields.io/github/last-commit/jinx-22/tank-card-pro)
+[![stars](https://img.shields.io/github/stars/jinx-22/tank-card-pro)](https://github.com/jinx-22/tank-card-pro/stargazers)
 [![Donate Bitcoin](https://img.shields.io/badge/₿-Bitcoin-F7931A?style=flat-square)](#bitcoin)
 [![Donate Lightning](https://img.shields.io/badge/⚡-Lightning-FFD700?style=flat-square)](#lightning)
 
@@ -13,27 +14,21 @@
 
 ---
 
-**Tank Card** ist eine Home-Assistant-Custom-Card zur Visualisierung von Tankfüllständen, Gesamtkapazität und Verbrauch.
+**Tank Card Pro** ist eine Home-Assistant-Custom-Card zur Visualisierung von Tankfüllständen, Gesamtkapazität und Verbrauch.
 
-**Aktuelle Version: 0.9.2**
+**Aktuelle Version: 0.9.3** (basiert auf Tank Card v0.9.2)
 
-## 🆕 0.9.2
+## 🆕 0.9.3
 
-- Füllstand-Warnung / Signalisierung (Warnstufe 1 orange, Stufe 2 rot) mit konfigurierbaren Schwellenwerten (Standard 20 % / 10 %)
-- Visuelles Leuchten + ein-/ausblendender Nebel hinter den Tanks
-- Optionale Benachrichtigungs-Automation, direkt im Karten-Editor erstellt: Home-Assistant-Benachrichtigung und/oder Mobile-App-Push, optional mit Wiederholung alle x Stunden / Tage
-- Automatische Einheitenerkennung über den Sensor (`unit: auto`), neue Einheit `gal`, eigene Einheiten und einstellbare Nachkommastellen (`decimals`)
-- Kartenhöhe jetzt mit Standard 350 px (250–1000 px)
-- Editor neu gegliedert: geführte Fragen unter **Inhalt**, Darstellung der Flüssigkeit unter **Anzeige**, neue Kategorie **Füllstand-Meldung / Signalisierung**
-- Entfernt: `entities` (individuelle Tanknamen), Hex-Farben bei `custom_color` und `%` / `em` / `px` bei `font_size` – siehe [Konfigurationsoptionen](#-konfigurationsoptionen)
+-
 
-<img width="50%" height="auto" alt="warn" src="https://github.com/user-attachments/assets/5e204451-2a55-4fc3-bd03-fe171db6a82d" />
+
 
 > **Hinweis:** Nach dem Update das Dashboard mit `Strg + F5` hart neu laden und den Browser-Cache löschen, damit Editor und Karte die neue Version laden.
 
 ---
 
-## 📖 Über Tank Card
+## 📖 Über Tank Card Pro
 
 Unterstützt werden Verbrauchssensoren sowie Füllstandssensoren mit absoluten Werten oder Prozentangaben. Geeignet für Heizöl, Wasser, Diesel, Gas, Pellets, Hackschnitzel und weitere Flüssigkeiten oder Schüttgüter – sowie für freie Farbdarstellungen.
 
@@ -65,25 +60,25 @@ Die Berechnung hängt vom gewählten Sensormodus ab:
 
 # 📦 Installation
 
-## Einfache Installation → [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card&category=plugin)
+## Einfache Installation → [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card-pro&category=plugin)
 
 ## HACS
 
 1. **HACS** öffnen
 2. **Frontend** auswählen
-3. Nach **Tank Card** suchen
+3. Nach **Tank Card Pro** suchen
 4. Karte installieren
 5. Home Assistant bzw. den Browser neu laden
 
 ## Manuell
 
-1. `tank-card.js` herunterladen
+1. `tank-card-pro.js` herunterladen
 
-2. Nach `/config/www/community/tank-card/` kopieren
+2. Nach `/config/www/community/tank-card-pro/` kopieren
 
 3. Unter **Einstellungen → Dashboards → Ressourcen** folgende Ressource hinzufügen:
 
-    `/local/community/tank-card/tank-card.js`
+    `/local/community/tank-card-pro/tank-card-pro.js`
 
     Typ: **JavaScript-Modul**
 
@@ -94,8 +89,8 @@ Anschließend den Browser neu laden, z. B. mit **Strg + F5**.
 # ⚙️ Beispiel-Konfiguration
 
 ```
-type: custom:tank-card
-title: Tank Card
+type: custom:tank-card-pro
+title: Tank Card Pro
 tank_count: 3
 tank_capacity: 1500
 initial_fill: 4500
@@ -135,8 +130,8 @@ card_height: 350
 
 | Option               | Standard                     | Typ     | Beschreibung                                                                                                                                                          |
 | -------------------- | ---------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`               | `custom:tank-card`           | string  | Kartentyp                                                                                                                                                             |
-| `title`              | `Tank Card`                  | string  | Kartentitel                                                                                                                                                           |
+| `type`               | `custom:tank-card-pro`           | string  | Kartentyp                                                                                                                                                             |
+| `title`              | `Tank Card Pro`                  | string  | Kartentitel                                                                                                                                                           |
 | `show_title`         | `true`                       | boolean | Titel anzeigen                                                                                                                                                        |
 | `tank_count`         | `3`                          | number  | Anzahl der Tanks (1–20)                                                                                                                                               |
 | `tank_capacity`      | `1500`                       | number  | Kapazität pro Tank (in der Mess-Einheit)                                                                                                                              |
@@ -270,7 +265,7 @@ Mit `unit: auto` übernimmt die Karte die Einheit des gewählten Sensors (`unit_
 
 # 🚨 Füllstandswarnungen & Benachrichtigungen
 
-Die Tank Card unterstützt zwei konfigurierbare Warnstufen:
+Die Tank Card Pro unterstützt zwei konfigurierbare Warnstufen:
 
 - **Warnstufe 1:** Orange
 - **Warnstufe 2:** Rot
@@ -311,14 +306,14 @@ Wird der Tank nachgefüllt und der Füllstand liegt wieder über der Schwelle, w
 Bitte gib folgende Informationen an:
 
 - Home-Assistant-Version
-- Tank-Card-Version
+- tank-card-pro-Version
 - verwendete Konfiguration
 - relevante Fehlermeldungen
 - kurze Beschreibung des Problems
 
 Bitte entferne persönliche oder vertrauliche Daten aus Konfigurationen und Logs.
 
-Erstelle ein [GitHub Issue](https://github.com/jinx-22/tank-card/issues).
+Erstelle ein [GitHub Issue](https://github.com/jinx-22/tank-card-pro/issues).
 
 ---
 
@@ -346,7 +341,7 @@ Erstelle ein [GitHub Issue](https://github.com/jinx-22/tank-card/issues).
 
 Vielen Dank für deine Unterstützung — ein kostenloser ⭐ hilft anderen, das Projekt zu entdecken:
 
-[![stars](https://img.shields.io/github/stars/jinx-22/tank-card)](https://github.com/jinx-22/tank-card/stargazers)
+[![stars](https://img.shields.io/github/stars/jinx-22/tank-card-pro)](https://github.com/jinx-22/tank-card-pro/stargazers)
 
 ---
 
