@@ -1,5 +1,5 @@
 const VERSION = "0.9.3";
-console.info("%c Tank Card %c v" + VERSION, "font-weight:bold;background:#03a9f4;color:#fff;padding:2px 6px;border-radius:3px 0 0 3px", "background:#555;color:#fff;padding:2px 6px;border-radius:0 3px 3px 0");
+console.info("%c Tank Card Pro %c v" + VERSION, "font-weight:bold;background:#03a9f4;color:#fff;padding:2px 6px;border-radius:3px 0 0 3px", "background:#555;color:#fff;padding:2px 6px;border-radius:0 3px 3px 0");
 const TXT = {
   en: {
     u_max: "Max:", u_level: "Current:", u_fill: "Level:", u_cons: "Cons.:", u_tank: "Tank",
