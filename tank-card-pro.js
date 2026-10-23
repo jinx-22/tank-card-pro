@@ -355,7 +355,7 @@ const solid = (() => {
     return cache[kind];
   };
 })();
-const AUTO_NAME = "Tank-Card";
+const AUTO_NAME = "Tank-Card-Pro";
 const stable = (v) => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) : x));
 const autoConfig = (c, h) => {
   const x = { ...DEF, ...c }, lg = lang(h);
@@ -503,7 +503,7 @@ const BUBBLE_COUNT = [[4, 1], [6, 2], [9, 3], [13, 5], [18, 7], [24, 10], [32, 1
 const waveCss = (s) => `
 @keyframes w{0%{background-position:100% 0}${Math.min(3.2 / s * 100, 40).toFixed(2)}%{background-position:0 0}100%{background-position:0 0}}
 .anim .l::before{animation:w ${s}s linear var(--wd) infinite}`;
-class TankCard extends HTMLElement {
+class TankCardPro extends HTMLElement {
   constructor() {
     super();
     this._hass = this._o = this._els = this._last = this._ro = this._u = this._key = this._th = this._dk = null;
@@ -517,7 +517,7 @@ class TankCard extends HTMLElement {
     this._hb = false;
     this.attachShadow({ mode: "open" });
   }
-  static getConfigElement() { return document.createElement("tank-card-editor"); }
+  static getConfigElement() { return document.createElement("tank-card-pro-editor"); }
   static getStubConfig() {
     return { initial_fill: 2250 };
   }
@@ -972,7 +972,7 @@ class TankCard extends HTMLElement {
     });
   }
 }
-class TankCardEditor extends HTMLElement {
+class TankCardProEditor extends HTMLElement {
   constructor() {
     super();
     this._hass = this._f = this._p = this._q = this._gn = this._t = this._raf = this._an = this._ct = this._saved = null;
@@ -1353,13 +1353,13 @@ class TankCardEditor extends HTMLElement {
     }
   }
 }
-if (!customElements.get("tank-card")) customElements.define("tank-card", TankCard);
-if (!customElements.get("tank-card-editor")) customElements.define("tank-card-editor", TankCardEditor);
+if (!customElements.get("tank-card-pro")) customElements.define("tank-card-pro", TankCardPro);
+if (!customElements.get("tank-card-pro-editor")) customElements.define("tank-card-pro-editor", TankCardEditor);
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === "tank-card")) {
+if (!window.customCards.some((c) => c.type === "tank-card-pro")) {
   window.customCards.push({
-    type: "tank-card", name: "Tank Card", preview: true, version: VERSION,
+    type: "tank-card-pro", name: "Tank Card", preview: true, version: VERSION,
     description: "Displays tank fill levels using consumption or level sensors.",
-    documentationURL: "https://github.com/jinx-22/tank-card"
+    documentationURL: "https://github.com/jinx-22/tank-card-pro"
   });
 }
