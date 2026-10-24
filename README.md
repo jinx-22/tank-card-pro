@@ -1,42 +1,26 @@
-# Tank Card – Tank Level Visualization
+# Tank Card Pro – Tank Level Visualization
+(Tank-Card Pro based on Tank-Card v0.9.2)
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration) [![GitHub total downloads](https://img.shields.io/github/downloads/jinx-22/tank-card/total?style=flat-square&color=red)](https://github.com/jinx-22/tank-card/releases/) [![GitHub release](https://img.shields.io/github/release/jinx-22/tank-card?include_prereleases=&sort=semver&color=blue)](https://github.com/jinx-22/tank-card/releases/) [![File size](https://img.shields.io/github/size/jinx-22/tank-card/tank-card.js?branch=main&label=Card%20Size)](https://github.com/jinx-22/tank-card/blob/main/tank-card.js) [![last commit](https://img.shields.io/github/last-commit/jinx-22/tank-card/main)](https://github.com/jinx-22/tank-card/commits/main) [![stars](https://img.shields.io/github/stars/jinx-22/tank-card)](https://github.com/jinx-22/tank-card/stargazers) [![Donate Bitcoin](https://img.shields.io/badge/%E2%82%BF-Bitcoin-F7931A?style=flat-square)](#bitcoin) [![Donate Lightning](https://img.shields.io/badge/%E2%9A%A1-Lightning-FFD700?style=flat-square)](#lightning)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration) [![GitHub total downloads](https://img.shields.io/github/downloads/jinx-22/tank-card-pro/total?style=flat-square&color=red)](https://github.com/jinx-22/tank-card-pro/releases/) [![GitHub release](https://img.shields.io/github/release/jinx-22/tank-card-pro?include_prereleases=&sort=semver&color=blue)](https://github.com/jinx-22/tank-card-pro/releases/) [![File size](https://img.shields.io/github/size/jinx-22/tank-card-pro/tank-card-pro.js?branch=main&label=Card%20Size)](https://github.com/jinx-22/tank-card-pro/blob/main/tank-card-pro.js) [![last commit](https://img.shields.io/github/last-commit/jinx-22/tank-card-pro/main)](https://github.com/jinx-22/tank-card-pro/commits/main) [![stars](https://img.shields.io/github/stars/jinx-22/tank-card-pro)](https://github.com/jinx-22/tank-card-pro/stargazers) [![Donate Bitcoin](https://img.shields.io/badge/%E2%82%BF-Bitcoin-F7931A?style=flat-square)](#bitcoin) [![Donate Lightning](https://img.shields.io/badge/%E2%9A%A1-Lightning-FFD700?style=flat-square)](#lightning)
 
 🇬🇧 **English** · 🇩🇪 [**Deutsch**](README_DE.md)
 
 ---
 
-**Tank Card** is a Home Assistant custom card for visualizing tank levels, total capacity, and consumption.
+**Tank Card Pro** is a Home Assistant custom card for visualizing tank levels, total capacity, and consumption.
 
-**Current Version: 0.9.2**
+**Current Version: 0.9.3**
 
-## 🆕 0.9.2
+## 🆕 0.9.3
 
-- Level warning / signaling (warning level 1 orange, level 2 red) with configurable thresholds (default 20 % / 10 %)
-- Visual glow + fading fog behind the tanks
-- Optional notification automation, created directly from the card editor: Home Assistant notification and/or mobile app push, with optional repeat every x hours / days
-- Automatic unit detection from the sensor (`unit: auto`), new unit `gal`, own units and configurable decimal places (`decimals`)
-- Card height now defaults to 350 px (250–1000 px)
-- Editor reorganized: guided questions under **Content**, liquid style moved to **Display**, new category **Level notification / signaling**
-- Removed: `entities` (individual tank names), Hex colors for `custom_color`, and `%` / `em` / `px` values for `font_size` – see [Configuration Options](#-configuration-options)
-
-<img width="50%" height="auto" alt="warn" src="https://github.com/user-attachments/assets/a4df9b41-6878-4e8f-be1a-7486a4f33984" />
+- 
 
 
 > **Note:** After updating, hard-reload the dashboard with `Ctrl + F5` and clear the browser cache so the editor and card load the new version.
 
 ---
 
-Prieview to next version  (Pre-Release for testing):
-
-<img width="40%" height="auto" alt="9 3" src="https://github.com/user-attachments/assets/28d22df7-e9d6-49bd-9ce9-0d0837f942ca" /><img width="40%" height="auto" alt="9 3" src="https://github.com/user-attachments/assets/7373409e-08d3-406c-9c4e-bcd98b048e8d" />
-
-
-
-
----
-
-## 📖 About Tank Card
+## 📖 About Tank Card Pro
 
 Supports consumption sensors as well as level sensors with absolute values or percentages. Suitable for heating oil, water, diesel, gas, pellets, wood chips, and other liquids or bulk materials — as well as free color displays.
 
@@ -68,25 +52,25 @@ The calculation depends on the selected sensor mode:
 
 # 📦 Installation
 
-## Easy install → [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card&category=plugin)
+## Easy install → [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card-pro&category=plugin)
 
 ## HACS
 
 1. Open **HACS**
 2. Select **Frontend**
-3. Search for **Tank Card**
+3. Search for **Tank Card Pro**
 4. Install the card
 5. Reload Home Assistant or the browser
 
 ## Manual
 
-1. Download `tank-card.js`
+1. Download `tank-card-pro.js`
 
-2. Copy it to `/config/www/community/tank-card/`
+2. Copy it to `/config/www/community/tank-card-pro/`
 
 3. Under **Settings → Dashboards → Resources** add the following resource:
 
-    `/local/community/tank-card/tank-card.js`
+    `/local/community/tank-card-pro/tank-card-pro.js`
 
     Type: **JavaScript Module**
 
@@ -97,8 +81,8 @@ Afterwards, reload the browser, e.g. with **Ctrl + F5**.
 # ⚙️ Example Configuration
 
 ```
-type: custom:tank-card
-title: Tank Card
+type: custom:tank-card-pro
+title: Tank Card Pro
 tank_count: 3
 tank_capacity: 1500
 initial_fill: 4500
@@ -138,8 +122,8 @@ card_height: 350
 
 | Option               | Default                      | Type    | Description                                                                                                                                             |
 | -------------------- | ---------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`               | `custom:tank-card`           | string  | Card type                                                                                                                                               |
-| `title`              | `Tank Card`                  | string  | Card title                                                                                                                                              |
+| `type`               | `custom:tank-card-pro`           | string  | Card type                                                                                                                                               |
+| `title`              | `Tank Card Pro`              | string  | Card title                                                                                                                                              |
 | `show_title`         | `true`                       | boolean | Show title                                                                                                                                              |
 | `tank_count`         | `3`                          | number  | Number of tanks (1–20)                                                                                                                                  |
 | `tank_capacity`      | `1500`                       | number  | Capacity per tank (in the measuring unit)                                                                                                               |
@@ -273,7 +257,7 @@ With `unit: auto` the card takes the unit from the selected sensor (`unit_of_mea
 
 # 🚨 Level Warnings & Notifications
 
-The Tank Card supports two configurable warning levels:
+The Tank Card Pro supports two configurable warning levels:
 
 - **Warning level 1:** orange
 - **Warning level 2:** red
@@ -314,14 +298,14 @@ When the tank is refilled and the level rises above the threshold again, the not
 Please provide the following information:
 
 - Home Assistant version
-- Tank Card version
+- Tank Card Pro version
 - Current configuration
 - Relevant error messages
 - Short description of the problem
 
 Please remove any personal or sensitive information from configurations and logs.
 
-Create a [GitHub Issue](https://github.com/jinx-22/tank-card/issues).
+Create a [GitHub Issue](https://github.com/jinx-22/tank-card-pro/issues).
 
 ---
 
@@ -349,7 +333,7 @@ Create a [GitHub Issue](https://github.com/jinx-22/tank-card/issues).
 
 Thank you for your support — a free ⭐ helps others discover the project:
 
-[![stars](https://img.shields.io/github/stars/jinx-22/tank-card)](https://github.com/jinx-22/tank-card/stargazers)
+[![stars](https://img.shields.io/github/stars/jinx-22/tank-card-pro)](https://github.com/jinx-22/tank-card-pro/stargazers)
 
 ---
 # 📜 License
