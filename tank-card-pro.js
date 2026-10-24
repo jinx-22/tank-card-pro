@@ -1,5 +1,5 @@
 const VERSION = "0.9.4";
-console.info("%c Tank Card %c v" + VERSION, "font-weight:bold;background:#03a9f4;color:#fff;padding:2px 6px;border-radius:3px 0 0 3px", "background:#555;color:#fff;padding:2px 6px;border-radius:0 3px 3px 0");
+console.info("%c Tank Card Pro %c v" + VERSION, "font-weight:bold;background:#03a9f4;color:#fff;padding:2px 6px;border-radius:3px 0 0 3px", "background:#555;color:#fff;padding:2px 6px;border-radius:0 3px 3px 0");
 const TXT = {
   en: {
     u_max: "Max:", u_level: "Current:", u_fill: "Level:", u_cons: "Cons.:", u_tank: "Tank",
@@ -33,10 +33,11 @@ const TXT = {
     warn_auto: "Create notification automation", warn_repeat: "Every", warn_repeat_unit: "Time unit",
     h_warn_time: "Time", h_warn_repeat: "0 = no repeat.",
     a_suffix: "Notification",
-    a_desc: "Created by Tank Card. Please change settings in the card editor, manual changes are overwritten.",
-    a_note: "Creates an automation in Home Assistant. Notifies at the interval set below as long as the level stays below the threshold. For “Days” at the set time, for hours on a fixed schedule! Repeated triggers within 10 minutes are suppressed. Changes only apply after “Create automation” / “Update automation”.",
+    a_desc: "Created by Tank Card Pro. Please change settings in the card editor, manual changes are overwritten.",
+    a_note: "Creates an automation in Home Assistant, only when you press the button, never automatically. When the editor opens, the values of an existing automation are read into the editor. Changes only apply after “Update automation”; saving the card does not change the automation. Cards with the same sensor share one automation. If you delete the card or change the sensor, the automation stays – please delete it yourself. Notifies at the interval set below as long as the level stays below the threshold. For “Days” at the set time, for hours on a fixed schedule! Repeated triggers within 10 minutes are suppressed.",
     a_create: "Create automation", a_update: "Update automation", a_delete: "Delete automation", a_confirm: "Delete the automation?",
-    a_s_wait: "Checking automation…", a_s_none: "Automation not created yet.", a_s_ok: "Automation “{n}” is up to date.", a_s_old: "Automation “{n}” differs from the card settings. Please update it.", a_s_err: "Automation status unknown: {e}",
+    a_read: "Read values from automation", a_s_nov: "This automation was created by an older version and has no readable values. Please update it once.", a_s_read: "Values read from automation “{n}”.",
+    a_s_wait: "Checking automation…", a_s_none: "Automation not created yet.", a_s_ok: "Automation “{n}” is up to date.", a_s_old: "Automation “{n}” differs from the editor values. “Update automation” applies them, “Read values from automation” discards your changes. Saving the card does not change the automation.", a_s_err: "Automation status unknown: {e}",
     a_s_created: "Automation “{n}” created.", a_s_updated: "Automation “{n}” updated.", a_s_deleted: "Automation “{n}” deleted.", a_s_fail: "Saving failed: {e}",
     a_need_sensor: "Select a sensor first.", a_need_warn: "Enable at least one warning level first.", a_need_channel: "Enable “Send notification” or “Send mobile app notification” first.", a_need_phone: "No mobile app devices found.", a_admin: "Administrator rights are required to manage the automation.",
     n_title: "Tank warning – level {s}", n_channel: "Tank warning", n_msg: "{t}: warning level {s} – level below {l} %. Now {p} % ({c} of {m}).",
@@ -106,10 +107,11 @@ const TXT = {
     warn_auto: "Benachrichtigungs-Automation erstellen", warn_repeat: "Alle", warn_repeat_unit: "Zeiteinheit",
     h_warn_time: "Uhrzeit", h_warn_repeat: "0 = keine Wiederholung.",
     a_suffix: "Benachrichtigung",
-    a_desc: "Von der Tank Card angelegt. Einstellungen bitte im Karten-Editor ändern, manuelle Änderungen werden überschrieben.",
-    a_note: "Legt in Home Assistant eine Automation an. Benachrichtigt im unten eingestellten Zeitabstand, solange der Füllstand unter der Schwelle bleibt. Bei „Tage“ zur eingestellten Uhrzeit, bei Stunden im festen Takt! Erneutes Auslösen innerhalb von 10 Minuten wird unterdrückt. Änderungen gelten erst nach „Automation anlegen“ / „Automation aktualisieren“.",
+    a_desc: "Von der Tank Card Pro angelegt. Einstellungen bitte im Karten-Editor ändern, manuelle Änderungen werden überschrieben.",
+    a_note: "Legt in Home Assistant eine Automation an, nur per Button, nie automatisch. Beim Öffnen des Editors werden die Werte einer vorhandenen Automation in den Editor eingelesen. Änderungen gelten erst nach „Automation aktualisieren“, das Speichern der Karte ändert die Automation nicht. Karten mit demselben Sensor teilen sich eine Automation. Wird die Karte gelöscht oder der Sensor gewechselt, bleibt die Automation bestehen, bitte selbst löschen. Benachrichtigt im unten eingestellten Zeitabstand, solange der Füllstand unter der Schwelle bleibt. Bei „Tage“ zur eingestellten Uhrzeit, bei Stunden im festen Takt! Erneutes Auslösen innerhalb von 10 Minuten wird unterdrückt.",
     a_create: "Automation anlegen", a_update: "Automation aktualisieren", a_delete: "Automation löschen", a_confirm: "Automation löschen?",
-    a_s_wait: "Automation wird geprüft …", a_s_none: "Automation noch nicht angelegt.", a_s_ok: "Automation „{n}“ ist aktuell.", a_s_old: "Automation „{n}“ weicht von den Karteneinstellungen ab. Bitte aktualisieren.", a_s_err: "Status der Automation unbekannt: {e}",
+    a_read: "Werte aus Automation einlesen", a_s_nov: "Diese Automation stammt aus einer älteren Version und enthält keine lesbaren Werte. Bitte einmal aktualisieren.", a_s_read: "Werte aus Automation „{n}“ eingelesen.",
+    a_s_wait: "Automation wird geprüft …", a_s_none: "Automation noch nicht angelegt.", a_s_ok: "Automation „{n}“ ist aktuell.", a_s_old: "Automation „{n}“ weicht von den Editor-Werten ab. „Automation aktualisieren“ übernimmt sie, „Werte aus Automation einlesen“ verwirft deine Änderungen. Das Speichern der Karte ändert die Automation nicht.", a_s_err: "Status der Automation unbekannt: {e}",
     a_s_created: "Automation „{n}“ angelegt.", a_s_updated: "Automation „{n}“ aktualisiert.", a_s_deleted: "Automation „{n}“ gelöscht.", a_s_fail: "Speichern fehlgeschlagen: {e}",
     a_need_sensor: "Bitte zuerst einen Sensor wählen.", a_need_warn: "Bitte zuerst mindestens eine Warnstufe aktivieren.", a_need_channel: "Bitte „Benachrichtigung senden“ oder „Mobile-App-Benachrichtigung senden“ aktivieren.", a_need_phone: "Keine Mobile-App-Geräte gefunden.", a_admin: "Für die Automation sind Administratorrechte nötig.",
     n_title: "Tank-Warnung – Stufe {s}", n_channel: "Tank-Warnung", n_msg: "{t}: Warnstufe {s} – Füllstand unter {l} %. Aktuell {p} % ({c} von {m}).",
@@ -186,7 +188,7 @@ const INFO = [
   { id: "cu", flag: "cost_used", k: "u_cu", off: true }, { id: "cr", flag: "cost_refill", k: "u_cr", off: true }
 ];
 const DEF = {
-  title: "Tank Card", tank_form: "rect", tank_style: "metal", gas_tank: false, tank_count: 3, tank_capacity: 1500, content_type: "heating_oil", custom_color: [33, 150, 243], liquid_style: "classic", sensor_mode: "consumption", unit: "auto",
+  title: "Tank Card Pro", tank_form: "rect", tank_style: "metal", gas_tank: false, tank_count: 3, tank_capacity: 1500, content_type: "heating_oil", custom_color: [33, 150, 243], liquid_style: "classic", sensor_mode: "consumption", unit: "auto",
   show_max: true, show_current: true, show_fill_level: true, show_consumption: true, show_unittank: true, show_title: true, show_tank_label: true, tank_label: "Tank",
   animation: false, animation_interval: 30, bubbles: false, bubble_amount: 3, font_size: 100, card_height: 350,
   warn_1: false, warn_1_level: 20, warn_2: false, warn_2_level: 10, warn_notify: true, warn_mobile: false, warn_glow: false, warn_auto: false, warn_repeat: 1, warn_repeat_unit: "d", warn_time: "14:00:00",
@@ -382,7 +384,7 @@ const solid = (() => {
     return cache[kind];
   };
 })();
-const AUTO_NAME = "Tank-Card";
+const AUTO_NAME = "tank-card-pro";
 const stable = (v) => JSON.stringify(v, (_, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) : x));
 const autoConfig = (c, h) => {
   const x = { ...DEF, ...c }, lg = lang(h);
@@ -401,7 +403,9 @@ const autoConfig = (c, h) => {
   const uraw = man || sensorUnit(h, sid) || sysUnit(h);
   const dec = BLANK(x.decimals) ? (/^(m[3³]|t)$/.test(uraw) ? 2 : 0) : Math.round(num(x.decimals, 0, 0, 5));
   const phones = mobile ? Object.keys(h?.services?.notify || {}).filter((k) => k.startsWith("mobile_app_")) : [];
-  const id = "tank_card_" + sid.replace(/\W+/g, "_"), res = { id, name, config: null, problem: "", note: "" };
+  // Machine-readable settings, stored at the top of the automation so the editor can read them back
+  const vars = { tc_w1: w1.on, tc_w1_level: w1.lvl, tc_w2: w2.on, tc_w2_level: w2.lvl, tc_notify: notify, tc_mobile: mobile, tc_time: at, tc_repeat: cnt, tc_unit: unit };
+  const id = "tank_card_" + sid.replace(/\W+/g, "_"), res = { id, name, config: null, problem: "", note: "", vars };
   if (!/^[a-z0-9_]+\.[a-z0-9_]+$/.test(sid)) res.problem = "a_need_sensor";
   else if (!w1.on && !w2.on) res.problem = "a_need_warn";
   else if (!notify && !mobile) res.problem = "a_need_channel";
@@ -450,11 +454,21 @@ const autoConfig = (c, h) => {
   if (notify) [1, 2].forEach((k) => clr.push({ action: "persistent_notification.dismiss", continue_on_error: true, data: { notification_id: pre + k } }));
   phones.forEach((ph) => [1, 2].forEach((k) => clr.push({ action: "notify." + ph, continue_on_error: true, data: { message: "clear_notification", data: { tag: pre + k } } })));
   res.config = {
-    alias: name, description: tr(lg, "a_desc"), mode: "queued", max: 5, triggers, conditions,
+    alias: name, description: tr(lg, "a_desc"), variables: vars, mode: "queued", max: 5, triggers, conditions,
     actions: [{ choose: [{ conditions: [{ condition: "trigger", id: "ok" }], sequence: clr }], default: seq }]
   };
   return res;
 };
+// Turns the stored automation variables back into editor settings
+const fromVars = (v) => ({
+  warn_1: v.tc_w1 === true, warn_1_level: num(v.tc_w1_level, DEF.warn_1_level, 1, 99),
+  warn_2: v.tc_w2 === true, warn_2_level: num(v.tc_w2_level, DEF.warn_2_level, 1, 99),
+  warn_notify: v.tc_notify !== false, warn_mobile: v.tc_mobile === true,
+  warn_time: typeof v.tc_time === "string" && v.tc_time ? v.tc_time : DEF.warn_time,
+  warn_repeat: Math.round(num(v.tc_repeat, DEF.warn_repeat, 0, 100)),
+  warn_repeat_unit: ENUM.warn_repeat_unit.includes(v.tc_unit) ? v.tc_unit : DEF.warn_repeat_unit,
+  warn_auto: true
+});
 const CSS = `
 :host{display:block;height:100%;min-height:240px;container-type:inline-size}
 ha-card{position:relative;height:100%;display:flex;flex-direction:column;gap:10px;padding:10px;box-sizing:border-box;overflow:hidden;container-type:inline-size;font-size:var(--fs,100%);color:var(--primary-text-color);background:radial-gradient(120% 70% at 50% 0,color-mix(in srgb,var(--card-background-color,#1c1c1c) 90%,#fff),var(--card-background-color,#1c1c1c))}
@@ -556,7 +570,7 @@ class TankCard extends HTMLElement {
     this._ref = null;
     this.attachShadow({ mode: "open" });
   }
-  static getConfigElement() { return document.createElement("tank-card-editor"); }
+  static getConfigElement() { return document.createElement("tank-card-pro-editor"); }
   static getStubConfig() {
     return { initial_fill: 2250 };
   }
@@ -593,7 +607,7 @@ class TankCard extends HTMLElement {
     }
   }
   setConfig(c) {
-    if (!c || typeof c !== "object" || Array.isArray(c)) throw new Error("Invalid Tank Card configuration.");
+    if (!c || typeof c !== "object" || Array.isArray(c)) throw new Error("Invalid Tank Card Pro configuration.");
     const e = (k) => (ENUM[k].includes(c[k]) ? c[k] : DEF[k]);
     const { n, total, fill, w: [w1, w2] } = core(c);
     const content = e("content_type"), form = e("tank_form"), style = e("tank_style"), mode = e("sensor_mode");
@@ -1118,7 +1132,8 @@ class TankCardEditor extends HTMLElement {
     this._aq = 0;
     this._busy = this._ju = false;
     this._err = this._info = "";
-    this._cid = this._srv = null;
+    this._cid = this._srv = this._sv = null;
+    this._imps = new Set();
     this._c = {};
     this._shown = undefined;
     this._shownAmt = undefined;
@@ -1258,7 +1273,7 @@ class TankCardEditor extends HTMLElement {
   }
   _build() {
     const st = el("style");
-    st.textContent = "ha-form{display:block;margin:8px 0}.note{margin:-4px 0 8px;padding:0 16px;font-size:12px;line-height:16px;color:var(--secondary-text-color)}.note.top{margin:4px 0 8px;font-weight:600}.note .b{font-weight:700}.q{margin:12px 0 0;font-weight:600;color:var(--primary-text-color)}ha-expansion-panel{display:block;margin:8px 0;--expansion-panel-content-padding:0 12px 12px}ha-expansion-panel[hidden]{display:none}.auto{margin:12px 0 0;padding:0 16px}.am{margin:0 0 10px;font-size:13px;line-height:18px;font-weight:500;white-space:pre-line}.ar{display:flex;flex-wrap:wrap;gap:8px}.ab{font:inherit;font-weight:500;padding:8px 16px;border:0;border-radius:18px;background:var(--primary-color);color:var(--text-primary-color,#fff);cursor:pointer}.ab:disabled{opacity:.4;cursor:default}.ab.ad{background:var(--error-color,#db4437)}ha-form[hidden]{display:none}ha-form.sep{margin-top:12px;padding-top:12px;border-top:1px solid var(--divider-color)}.row{display:flex;gap:8px;align-items:flex-start}.row ha-form{min-width:0}.row ha-form:first-child{flex:1 1 0}.row ha-form:last-child{flex:1.25 1 0}.q.top{margin-top:12px;padding-top:12px;border-top:1px solid var(--divider-color)}.q.big{font-size:1.15em;margin:4px 0 0;padding:4px 0 12px;border-bottom:1px solid var(--divider-color)}";
+    st.textContent = "ha-form{display:block;margin:8px 0}.note{margin:-4px 0 8px;padding:0 16px;font-size:12px;line-height:16px;color:var(--secondary-text-color)}.note.top{margin:4px 0 8px;font-weight:600}.note .b{font-weight:700}.q{margin:12px 0 0;font-weight:600;color:var(--primary-text-color)}ha-expansion-panel{display:block;margin:8px 0;--expansion-panel-content-padding:0 12px 12px}ha-expansion-panel[hidden]{display:none}.auto{margin:12px 0 0;padding:0 16px}.am{margin:0 0 10px;font-size:13px;line-height:18px;font-weight:500;white-space:pre-line}.ar{display:flex;flex-wrap:wrap;gap:8px}.ab{font:inherit;font-weight:500;padding:8px 16px;border:0;border-radius:18px;background:var(--primary-color);color:var(--text-primary-color,#fff);cursor:pointer}.ab:disabled{opacity:.4;cursor:default}.ab.ad{background:var(--error-color,#db4437)}.ab.ao{background:transparent;color:var(--primary-color);box-shadow:inset 0 0 0 1px var(--primary-color)}.ab.bl:not(:disabled){animation:abl 2.4s ease-in-out infinite}@keyframes abl{0%,100%{opacity:1}50%{opacity:.35}}@media(prefers-reduced-motion:reduce){.ab.bl:not(:disabled){animation:none;outline:2px solid var(--warning-color,#ffa600);outline-offset:2px}}ha-form[hidden]{display:none}ha-form.sep{margin-top:12px;padding-top:12px;border-top:1px solid var(--divider-color)}.row{display:flex;gap:8px;align-items:flex-start}.row ha-form{min-width:0}.row ha-form:first-child{flex:1 1 0}.row ha-form:last-child{flex:1.25 1 0}.q.top{margin-top:12px;padding-top:12px;border-top:1px solid var(--divider-color)}.q.big{font-size:1.15em;margin:4px 0 0;padding:4px 0 12px;border-bottom:1px solid var(--divider-color)}";
     const root = el("div");
     this._f = [];
     this._p = [];
@@ -1320,21 +1335,29 @@ class TankCardEditor extends HTMLElement {
     this.shadowRoot.replaceChildren(st, root);
   }
   _autoUI() {
-    const box = el("div", "auto"), msg = el("div", "am"), row = el("div", "ar"), bs = el("button", "ab"), bd = el("button", "ab ad");
-    bs.type = bd.type = "button";
+    const box = el("div", "auto"), msg = el("div", "am"), row = el("div", "ar");
+    const bs = el("button", "ab"), br = el("button", "ab ao"), bd = el("button", "ab ad");
+    bs.type = br.type = bd.type = "button";
     bs.addEventListener("click", () => this._asave());
+    br.addEventListener("click", () => this._aread());
     bd.addEventListener("click", () => this._adel());
-    row.append(bs, bd);
+    row.append(bs, br, bd);
     box.append(msg, row);
-    return { box, msg, bs, bd };
+    return { box, msg, bs, br, bd };
   }
   _emsg(e) { return String(e?.body?.message || e?.error || e?.message || e); }
   _has(a) { return this._cid === a.id && this._srv !== null; }
+  _vdiff(a) { return !!this._sv && stable(a.vars) !== stable(this._sv); }
+  _load() {
+    // Puts the values of the automation into the editor (the card is only changed when the dialog is saved)
+    if (this._sv) this._changed({ ...this._data(), ...fromVars(this._sv) }, undefined, true);
+  }
   _need() {
+    // The automation is only read here, never written: the editor looks it up when it opens or when the sensor changes
     const h = this._hass;
-    if (!h || !autoOn(this._c) || !h.user?.is_admin) return;
+    if (!h || !h.user?.is_admin) return;
     const a = autoConfig(this._c, h);
-    if (a.problem === "a_need_sensor") { this._cid = this._srv = null; return; }
+    if (a.problem === "a_need_sensor") { this._cid = this._srv = this._sv = null; return; }
     if (a.id === this._cid) return;
     clearTimeout(this._ct);
     this._ct = setTimeout(() => this._fetch(), 600);
@@ -1343,39 +1366,48 @@ class TankCardEditor extends HTMLElement {
     const an = this._an, h = this._hass;
     if (!an || !h) return;
     const lg = lang(h), a = autoConfig(this._c, h), admin = !!h.user?.is_admin, has = this._has(a);
+    const sig = a.config ? stable(a.config) : "", sv = this._saved;
+    const ok = has && !!a.config && (this._srv === sig || (!!sv && sv.id === a.id && sv.sig === sig && sv.srv === this._srv));
     let t;
     if (!admin) t = tr(lg, "a_admin");
     else if (a.problem) t = tr(lg, a.problem);
     else if (this._cid !== a.id) t = tr(lg, "a_s_wait");
     else if (this._err) t = tpl(tr(lg, "a_s_err"), { e: this._err });
     else if (!has) t = tr(lg, "a_s_none");
-    else {
-      const sig = stable(a.config), sv = this._saved;
-      t = tpl(tr(lg, this._srv === sig || (!!sv && sv.id === a.id && sv.sig === sig && sv.srv === this._srv) ? "a_s_ok" : "a_s_old"), { n: a.name });
-    }
+    else t = tpl(tr(lg, ok ? "a_s_ok" : "a_s_old"), { n: a.name });
+    if (admin && has && !this._sv) t += "\n" + tr(lg, "a_s_nov");
     if (a.note && !a.problem) t += "\n" + tr(lg, a.note);
     an.msg.textContent = (this._info ? this._info + "\n" : "") + t;
     an.bs.textContent = tr(lg, has ? "a_update" : "a_create");
-    an.bs.disabled = !admin || !!a.problem || this._busy;
+    an.bs.disabled = !admin || !!a.problem || this._busy || this._cid !== a.id;
+    an.bs.classList.toggle("bl", has && !ok);
+    an.br.textContent = tr(lg, "a_read");
+    an.br.disabled = !admin || this._busy || !has || !this._vdiff(a);
     an.bd.textContent = tr(lg, "a_delete");
     an.bd.hidden = !has;
     an.bd.disabled = !admin || this._busy;
   }
   async _fetch() {
     const h = this._hass;
-    if (!h || !autoOn(this._c)) return;
+    if (!h) return;
     const a = autoConfig(this._c, h), q = ++this._aq;
     if (a.problem === "a_need_sensor") return;
-    let srv = null, err = "";
+    let srv = null, sv = null, err = "";
     try {
       const cur = { ...(await h.callApi("GET", "config/automation/config/" + a.id)) };
       delete cur.id;
       srv = stable(cur);
+      sv = cur.variables && typeof cur.variables === "object" ? cur.variables : null;
     } catch (e) { if (e?.status_code !== 404) err = this._emsg(e); }
-    if (q !== this._aq) return;
+    if (q !== this._aq || autoConfig(this._c, h).id !== a.id) return;
     if (srv !== null && this._ju && a.config) this._saved = { id: a.id, sig: stable(a.config), srv };
     this._ju = false;
-    this._cid = a.id; this._srv = srv; this._err = err;
+    this._cid = a.id; this._srv = srv; this._sv = sv; this._err = err;
+    // First look at this automation in this editor session: take over its values (also switches "Create notification automation" on)
+    if (!err && !this._imps.has(a.id)) {
+      this._imps.add(a.id);
+      if (sv && (this._vdiff(autoConfig(this._c, h)) || !autoOn(this._c))) this._load();
+    }
     this._arender();
   }
   async _asave() {
@@ -1392,6 +1424,13 @@ class TankCardEditor extends HTMLElement {
     this._busy = false;
     await this._fetch();
   }
+  _aread() {
+    if (!this._sv || this._busy) return;
+    const a = autoConfig(this._c, this._hass);
+    this._load();
+    this._info = tpl(tr(lang(this._hass), "a_s_read"), { n: a.name });
+    this._arender();
+  }
   async _adel() {
     const h = this._hass, lg = lang(h), a = autoConfig(this._c, h);
     if (!this._has(a) || this._busy || !window.confirm(tr(lg, "a_confirm"))) return;
@@ -1400,7 +1439,7 @@ class TankCardEditor extends HTMLElement {
     try {
       await h.callApi("DELETE", "config/automation/config/" + a.id);
       this._info = tpl(tr(lg, "a_s_deleted"), { n: a.name });
-      this._srv = this._saved = null;
+      this._srv = this._sv = this._saved = null;
     } catch (e) { this._info = tpl(tr(lg, "a_s_fail"), { e: this._emsg(e) }); }
     this._busy = false;
     this._arender();
@@ -1444,7 +1483,7 @@ class TankCardEditor extends HTMLElement {
     const d = this._data(), p = this._warnFix(d);
     if (p) this._changed({ ...d, ...p }, Object.keys(p));
   }
-  _changed(value, fixed) {
+  _changed(value, fixed, imp) {
     if (!value || typeof value !== "object") return;
     const next = { ...value }, reset = [];
     for (const k of ["title", "tank_label", "tank_count", "tank_capacity", "initial_fill", "decimals", "warn_1_level", "warn_2_level", "warn_repeat", "refill_threshold", "cost_used_price", "cost_refill_price", "refill_to_pct"]) {
@@ -1478,7 +1517,7 @@ class TankCardEditor extends HTMLElement {
     if (!gasOk(next)) next.gas_tank = false;
     else if (!gasOk(this._c)) next.gas_tank = true;
     if (!warnOn(next)) for (const k of ["warn_notify", "warn_mobile", "warn_glow", "warn_auto"]) delete next[k];
-    else if (!warnOn(this._c)) { next.warn_glow = true; next.warn_notify = true; }
+    else if (!imp && !warnOn(this._c)) { next.warn_glow = true; next.warn_notify = true; }
     const fill = next.initial_fill, stored = this._c.initial_fill;
     if (fill !== undefined) {
       if (fill === this._shown) {
@@ -1507,13 +1546,13 @@ class TankCardEditor extends HTMLElement {
     }
   }
 }
-if (!customElements.get("tank-card")) customElements.define("tank-card", TankCard);
-if (!customElements.get("tank-card-editor")) customElements.define("tank-card-editor", TankCardEditor);
+if (!customElements.get("tank-card-pro")) customElements.define("tank-card-pro", TankCard);
+if (!customElements.get("tank-card-pro-editor")) customElements.define("tank-card-pro-editor", TankCardEditor);
 window.customCards = window.customCards || [];
-if (!window.customCards.some((c) => c.type === "tank-card")) {
+if (!window.customCards.some((c) => c.type === "tank-card-pro")) {
   window.customCards.push({
-    type: "tank-card", name: "Tank Card", preview: true, version: VERSION,
+    type: "tank-card-pro", name: "Tank Card Pro", preview: true, version: VERSION,
     description: "Displays tank fill levels using consumption or level sensors.",
-    documentationURL: "https://github.com/jinx-22/tank-card"
+    documentationURL: "https://github.com/jinx-22/tank-card-pro"
   });
 }
