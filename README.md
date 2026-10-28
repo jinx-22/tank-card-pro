@@ -27,7 +27,7 @@
 - Warning level 2 can no longer drop below 1 %
 - German editor: “Design” instead of “Theme”
 
-<img width="40%" height="auto" alt="Pro" src="https://github.com/user-attachments/assets/aab577db-78a1-4353-af59-18e525f79545" />
+<img width="40%" height="auto" alt="Pro" src="https://github.com/user-attachments/assets/e90c872a-9728-473e-aa07-b820dce7ac00" />
 
 ---
 
