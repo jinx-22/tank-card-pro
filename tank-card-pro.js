@@ -1,10 +1,12 @@
-const VERSION = "0.9.4";
+const VERSION = "0.9.5";
 console.info("%c Tank Card Pro %c v" + VERSION, "font-weight:bold;background:#03a9f4;color:#fff;padding:2px 6px;border-radius:3px 0 0 3px", "background:#555;color:#fff;padding:2px 6px;border-radius:0 3px 3px 0");
 const TXT = {
   en: {
-    u_max: "Max:", u_level: "Current:", u_fill: "Level:", u_cons: "Cons.:", u_tank: "Tank",
-    u_lin: "Range Ø:", u_sea: "Range (s):", u_refill: "Refilled:", u_cu: "Cost so far:", u_cr: "Refill cost:",
-    u_avg: "Usage Ø:", u_yd: "Yesterday:", u_td: "Today:",
+    u_max: "Max:", u_level: "Current:", u_fill: "Level:", u_cons: "Consumption:", u_tank: "Tank",
+    ab_cons: "Cons.:",
+    u_lin: "Range (linear):", u_sea: "Range (seasonal):", u_refill: "Refilled:", u_cu: "{c} so far:", u_cr: "{c} refill:",
+    u_avg: "Ø/day:", u_yd: "Yesterday:", u_td: "Today:",
+    ab_lin: "Range Ø:", ab_sea: "Range (s):",
     title: "Title", s_tank: "Tank", s_content: "Content", s_display: "Display", s_animation: "Animation",
     tank_form: "Tank shape", tank_count: "Number of tanks", tank_capacity: "Capacity per tank", content_type: "Content type", custom_color: "Color", liquid_style: "Liquid style",
     sensor_mode: "Sensor mode", initial_fill: "Initial fill",
@@ -34,15 +36,16 @@ const TXT = {
     h_warn_time: "Time", h_warn_repeat: "0 = no repeat.",
     a_suffix: "Notification",
     a_desc: "Created by Tank Card Pro. Please change settings in the card editor, manual changes are overwritten.",
-    a_note: "Creates an automation in Home Assistant, only when you press the button, never automatically. When the editor opens, the values of an existing automation are read into the editor. Changes only apply after “Update automation”; saving the card does not change the automation. Cards with the same sensor share one automation. If you delete the card or change the sensor, the automation stays – please delete it yourself. Notifies at the interval set below as long as the level stays below the threshold. For “Days” at the set time, for hours on a fixed schedule! Repeated triggers within 10 minutes are suppressed.",
+    a_note: "Creates an automation in Home Assistant, only when you press the button, never automatically. When the editor opens, the values of an existing automation are read into the editor. Changes only apply after “Update automation”; saving the card does not change the automation. Cards with the same sensor share one automation. If you delete the card or change the sensor, the automation stays – please delete it yourself. Notifies at the interval set below as long as the level stays below the threshold. For “Days” at the set time, for hours on a fixed schedule!",
     a_create: "Create automation", a_update: "Update automation", a_delete: "Delete automation", a_confirm: "Delete the automation?",
     a_read: "Read values from automation", a_s_nov: "This automation was created by an older version and has no readable values. Please update it once.", a_s_read: "Values read from automation “{n}”.",
     a_s_wait: "Checking automation…", a_s_none: "Automation not created yet.", a_s_ok: "Automation “{n}” is up to date.", a_s_old: "Automation “{n}” differs from the editor values. “Update automation” applies them, “Read values from automation” discards your changes. Saving the card does not change the automation.", a_s_err: "Automation status unknown: {e}",
     a_s_created: "Automation “{n}” created.", a_s_updated: "Automation “{n}” updated.", a_s_deleted: "Automation “{n}” deleted.", a_s_fail: "Saving failed: {e}",
     a_need_sensor: "Select a sensor first.", a_need_warn: "Enable at least one warning level first.", a_need_channel: "Enable “Send notification” or “Send mobile app notification” first.", a_need_phone: "No mobile app devices found.", a_admin: "Administrator rights are required to manage the automation.",
     n_title: "Tank warning – level {s}", n_channel: "Tank warning", n_msg: "{t}: warning level {s} – level below {l} %. Now {p} % ({c} of {m}).",
-    e_none: "Sensor missing", e_unav: "Sensor unavailable",
-    s_adv: "Advanced settings", q_badges: "Display badges", q_badges2: "More display badges",
+    e_unav: "Sensor unavailable",
+    q_badges: "Display badges", n_order: "Sorted in the order of activation.",
+    s_adv: "Advanced settings", q_badges2: "More display badges", tank_name: "Name of tank {n}:",
     show_avg: "Show average consumption per day", show_yesterday: "Show consumption yesterday", show_today: "Show consumption today",
     calc_linear: "Calculate linear range", calc_linear_format: "Show as",
     calc_seasonal: "Calculate seasonal range", calc_seasonal_format: "Show as",
@@ -76,9 +79,11 @@ const TXT = {
     o_date: "Show as date", o_days: "Show in days", o_weeks: "Show in weeks"
   },
   de: {
-    u_level: "Aktuell:", u_fill: "Füllst.:", u_cons: "Verbr.:",
-    u_lin: "Reichw.Ø:", u_sea: "Reichw.(s):", u_refill: "Nachgef.:", u_cu: "Kosten bisher:", u_cr: "Füllkosten:",
-    u_avg: "Ø Verbr./Tag:", u_yd: "Verbr. gestern:", u_td: "Verbr. heute:",
+    u_level: "Aktuell:", u_fill: "Füllstand:", u_cons: "Verbrauch:",
+    ab_fill: "Füllst.:", ab_cons: "Verbr.:",
+    u_lin: "Reichweite (linear):", u_sea: "Reichweite (saisonal):", u_refill: "Nachgefüllt:", u_cu: "{c} bisher:", u_cr: "{c} Füllung:",
+    u_avg: "Ø/Tag:", u_yd: "Gestern:", u_td: "Heute:",
+    ab_lin: "Reichw.Ø:", ab_sea: "Reichw.(s):", ab_refill: "Nachgef.:",
     title: "Titel", s_content: "Inhalt", s_display: "Anzeige",
     tank_form: "Tankform", tank_count: "Anzahl der Tanks", tank_capacity: "Kapazität pro Tank", content_type: "Inhalt", custom_color: "Farbe", liquid_style: "Darstellung der Flüssigkeit",
     sensor_mode: "Sensorart", initial_fill: "Anfangsbestand",
@@ -108,15 +113,16 @@ const TXT = {
     h_warn_time: "Uhrzeit", h_warn_repeat: "0 = keine Wiederholung.",
     a_suffix: "Benachrichtigung",
     a_desc: "Von der Tank Card Pro angelegt. Einstellungen bitte im Karten-Editor ändern, manuelle Änderungen werden überschrieben.",
-    a_note: "Legt in Home Assistant eine Automation an, nur per Button, nie automatisch. Beim Öffnen des Editors werden die Werte einer vorhandenen Automation in den Editor eingelesen. Änderungen gelten erst nach „Automation aktualisieren“, das Speichern der Karte ändert die Automation nicht. Karten mit demselben Sensor teilen sich eine Automation. Wird die Karte gelöscht oder der Sensor gewechselt, bleibt die Automation bestehen, bitte selbst löschen. Benachrichtigt im unten eingestellten Zeitabstand, solange der Füllstand unter der Schwelle bleibt. Bei „Tage“ zur eingestellten Uhrzeit, bei Stunden im festen Takt! Erneutes Auslösen innerhalb von 10 Minuten wird unterdrückt.",
+    a_note: "Legt in Home Assistant eine Automation an, nur per Button, nie automatisch. Beim Öffnen des Editors werden die Werte einer vorhandenen Automation in den Editor eingelesen. Änderungen gelten erst nach „Automation aktualisieren“, das Speichern der Karte ändert die Automation nicht. Karten mit demselben Sensor teilen sich eine Automation. Wird die Karte gelöscht oder der Sensor gewechselt, bleibt die Automation bestehen, bitte selbst löschen. Benachrichtigt im unten eingestellten Zeitabstand, solange der Füllstand unter der Schwelle bleibt. Bei „Tage“ zur eingestellten Uhrzeit, bei Stunden im festen Takt!",
     a_create: "Automation anlegen", a_update: "Automation aktualisieren", a_delete: "Automation löschen", a_confirm: "Automation löschen?",
     a_read: "Werte aus Automation einlesen", a_s_nov: "Diese Automation stammt aus einer älteren Version und enthält keine lesbaren Werte. Bitte einmal aktualisieren.", a_s_read: "Werte aus Automation „{n}“ eingelesen.",
     a_s_wait: "Automation wird geprüft …", a_s_none: "Automation noch nicht angelegt.", a_s_ok: "Automation „{n}“ ist aktuell.", a_s_old: "Automation „{n}“ weicht von den Editor-Werten ab. „Automation aktualisieren“ übernimmt sie, „Werte aus Automation einlesen“ verwirft deine Änderungen. Das Speichern der Karte ändert die Automation nicht.", a_s_err: "Status der Automation unbekannt: {e}",
     a_s_created: "Automation „{n}“ angelegt.", a_s_updated: "Automation „{n}“ aktualisiert.", a_s_deleted: "Automation „{n}“ gelöscht.", a_s_fail: "Speichern fehlgeschlagen: {e}",
     a_need_sensor: "Bitte zuerst einen Sensor wählen.", a_need_warn: "Bitte zuerst mindestens eine Warnstufe aktivieren.", a_need_channel: "Bitte „Benachrichtigung senden“ oder „Mobile-App-Benachrichtigung senden“ aktivieren.", a_need_phone: "Keine Mobile-App-Geräte gefunden.", a_admin: "Für die Automation sind Administratorrechte nötig.",
     n_title: "Tank-Warnung – Stufe {s}", n_channel: "Tank-Warnung", n_msg: "{t}: Warnstufe {s} – Füllstand unter {l} %. Aktuell {p} % ({c} von {m}).",
-    e_none: "Sensor fehlt", e_unav: "Sensor nicht verfügbar",
-    s_adv: "Erweiterte Einstellungen", q_badges: "Anzeige-Schilder/Badges", q_badges2: "Weitere Anzeige-Schilder / Badges",
+    e_unav: "Sensor nicht verfügbar",
+    q_badges: "Anzeige-Schilder/Badges", n_order: "Sortierung nach Reihenfolge der Aktivierung.",
+    s_adv: "Erweiterte Einstellungen", q_badges2: "Weitere Anzeige-Schilder / Badges", tank_name: "Name Tank {n}:",
     show_avg: "Durchschnittsverbrauch pro Tag anzeigen", show_yesterday: "Verbrauch gestern anzeigen", show_today: "Verbrauch heute anzeigen",
     calc_linear: "Reichweite linear berechnen", calc_linear_format: "Anzeigen als",
     calc_seasonal: "Reichweite saisonal berechnen", calc_seasonal_format: "Anzeigen als",
@@ -187,6 +193,7 @@ const INFO = [
   { id: "refill", flag: "detect_refill", k: "u_refill", off: true },
   { id: "cu", flag: "cost_used", k: "u_cu", off: true }, { id: "cr", flag: "cost_refill", k: "u_cr", off: true }
 ];
+const CHIPS = new Set(INFO.map((i) => i.flag));
 const DEF = {
   title: "Tank Card Pro", tank_form: "rect", tank_style: "metal", gas_tank: false, tank_count: 3, tank_capacity: 1500, content_type: "heating_oil", custom_color: [33, 150, 243], liquid_style: "classic", sensor_mode: "consumption", unit: "auto",
   show_max: true, show_current: true, show_fill_level: true, show_consumption: true, show_unittank: true, show_title: true, show_tank_label: true, tank_label: "Tank",
@@ -199,7 +206,6 @@ const DEF = {
 const WARN_HYST = .5;
 const RUN_TOL = .5;
 const RUN_GAP = 3 * 36e5;
-const SETTLE = 10 * 6e4;
 const HIST_DAYS = 365;
 const SEASON_MIN = 300;
 const DAY = 864e5;
@@ -213,16 +219,21 @@ const statRows = async (h, id, start, end, period) => {
     return (res?.[id] || []).map((r) => [typeof r.start === "number" ? r.start : Date.parse(r.start), Number.parseFloat(r.state ?? r.mean)]);
   } catch { return []; }
 };
-const ORDER = ["type", "tank_form", "tank_style", "gas_tank", "tank_count", "tank_capacity", "sensor_mode", "consumption_sensor", "level_sensor", "initial_fill", "content_type", "custom_color", "unit", "decimals",
-  "show_title", "title", "show_tank_label", "tank_label", "show_max", "show_current", "show_fill_level", "show_consumption", "show_unittank", "liquid_style", "card_height", "font_size", "theme",
+const ORDER = ["type", "tank_form", "tank_style", "gas_tank", "tank_count", "tank_capacity", "entities", "sensor_mode", "consumption_sensor", "level_sensor", "initial_fill", "content_type", "custom_color", "unit", "decimals",
+  "show_title", "title", "show_tank_label", "tank_label", "@chips", "show_unittank", "liquid_style", "card_height", "font_size", "theme",
   "animation", "animation_interval", "bubbles", "bubble_amount",
   "warn_1", "warn_1_level", "warn_2", "warn_2_level", "warn_glow", "warn_auto", "warn_time", "warn_repeat", "warn_repeat_unit", "warn_notify", "warn_mobile",
-  "show_avg", "show_yesterday", "show_today",
-  "calc_linear", "calc_linear_format", "calc_seasonal", "calc_seasonal_format", "detect_refill", "refill_threshold", "cost_used", "cost_used_price", "cost_used_per", "cost_refill", "refill_to_pct", "cost_refill_price", "cost_refill_per"];
+  "calc_linear_format", "calc_seasonal_format", "refill_threshold", "cost_used_price", "cost_used_per", "refill_to_pct", "cost_refill_price", "cost_refill_per",
+];
 const LIVE = new Set(["sensor", "d_th"]);
+const RANGES = [["card_height", 250, 1000], ["font_size", 50, 200], ["animation_interval", 5, 60], ["bubble_amount", 1, 8]];
+// The chips keep the order in which they were switched on (= key order in the config)
 const sortCfg = (c) => {
   const r = {};
-  for (const k of ORDER) if (k in c) r[k] = c[k];
+  for (const k of ORDER) {
+    if (k === "@chips") Object.keys(c).forEach((x) => { if (CHIPS.has(x)) r[x] = c[x]; });
+    else if (k in c) r[k] = c[k];
+  }
   for (const k in c) if (!(k in r) && k !== "grid_options") r[k] = c[k];
   if ("grid_options" in c) r.grid_options = c.grid_options;
   return r;
@@ -236,21 +247,24 @@ const memo = (C, ttl, id, f) => {
   p.catch(() => { if (C[id]?.p === p) delete C[id]; });
   return p;
 };
-const hist = (h, id, from) => h.callApi("GET", `history/period/${from.toISOString()}?filter_entity_id=${encodeURIComponent(id)}&minimal_response&no_attributes&significant_changes_only=0`)
+// end_time is always sent: without it Home Assistant only returns the 24 hours after the start time
+const hist = (h, id, from) => h.callApi("GET", `history/period/${from.toISOString()}?filter_entity_id=${encodeURIComponent(id)}&end_time=${encodeURIComponent(new Date().toISOString())}&minimal_response&no_attributes&significant_changes_only=0`)
   .then((res) => (res?.[0] || []).map((r) => [Date.parse(r.last_changed || r.last_updated), Number.parseFloat(r.state)]));
+const sinceYesterday = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - 1);
+  return d;
+};
 const loadRows = (h, id) => memo(RC, DAY, id, async () => {
   const end = new Date(), start = new Date(end.getTime() - HIST_DAYS * DAY);
+  // Older days come from the hourly long-term statistics, the last two days (every single change) from the history
   const stat = await statRows(h, id, start, end, "hour");
-  const a = await hist(h, id, stat.length ? new Date(Math.max(start.getTime(), end.getTime() - 10 * DAY)) : start);
+  const a = await hist(h, id, stat.length ? sinceYesterday() : start);
   const first = (a.find((q) => Number.isFinite(q[0]) && Number.isFinite(q[1])) || [Infinity])[0];
   return stat.filter((q) => q[0] < first).concat(a);
 });
-const loadRecent = (h, id) => memo(RR, 3e5, id, () => {
-  const from = new Date();
-  from.setHours(0, 0, 0, 0);
-  from.setDate(from.getDate() - 1);
-  return hist(h, id, from);
-});
+const loadRecent = (h, id) => memo(RR, 3e5, id, () => hist(h, id, sinceYesterday()));
 const gasOk = (c) => { const x = { ...DEF, ...c }; return x.tank_style === "metal" && x.tank_form === "capsule" && Number(x.tank_count) === 1; };
 const warnOn = (c) => c.warn_1 === true || c.warn_2 === true;
 const autoOn = (c) => c.warn_auto === true && warnOn(c);
@@ -276,7 +290,6 @@ const core = (c) => {
 const levelAmt = (m, v, fill, total) => m === "consumption" ? clamp(fill - Math.max(v, 0), 0, total) : m === "fill_level_percent" ? total * clamp(v, 0, 100) / 100 : clamp(v, 0, total);
 const stNum = (h, id) => { const t = String(h?.states?.[id]?.state ?? "").trim(); return t ? Number(t) : NaN; };
 const lang = (h) => String(h?.locale?.language || document.documentElement.lang || "en").toLowerCase().startsWith("de") ? "de" : "en";
-const inApp = (h) => !!h?.auth?.external || (typeof navigator !== "undefined" && /Home ?Assistant/i.test(navigator.userAgent));
 const tr = (l, k) => TXT[l][k] ?? TXT.en[k] ?? k;
 const tpl = (s, v) => s.replace(/\{(\w)\}/g, (m, k) => (k in v ? v[k] : m));
 const el = (tag, cls, text) => {
@@ -405,7 +418,7 @@ const autoConfig = (c, h) => {
   const phones = mobile ? Object.keys(h?.services?.notify || {}).filter((k) => k.startsWith("mobile_app_")) : [];
   // Machine-readable settings, stored at the top of the automation so the editor can read them back
   const vars = { tc_w1: w1.on, tc_w1_level: w1.lvl, tc_w2: w2.on, tc_w2_level: w2.lvl, tc_notify: notify, tc_mobile: mobile, tc_time: at, tc_repeat: cnt, tc_unit: unit };
-  const id = "tank_card_" + sid.replace(/\W+/g, "_"), res = { id, name, config: null, problem: "", note: "", vars };
+  const id = "tank_card_pro_" + sid.replace(/\W+/g, "_"), res = { id, name, config: null, problem: "", note: "", vars };
   if (!/^[a-z0-9_]+\.[a-z0-9_]+$/.test(sid)) res.problem = "a_need_sensor";
   else if (!w1.on && !w2.on) res.problem = "a_need_warn";
   else if (!notify && !mobile) res.problem = "a_need_channel";
@@ -425,12 +438,14 @@ const autoConfig = (c, h) => {
   for (const [tid, w] of [["s1", w1], ["s2", w2]]) if (w.on) triggers.push({ trigger: "numeric_state", id: tid, entity_id: sid, [mode === "consumption" ? "above" : "below"]: thr(w.lvl) });
   triggers.push({ trigger: "numeric_state", id: "ok", entity_id: sid, [rev]: thr((w1.on ? w1.lvl : w2.lvl) + WARN_HYST) });
   if (w1.on && w2.on) triggers.push({ trigger: "numeric_state", id: "u2", entity_id: sid, [rev]: thr(w2.lvl + WARN_HYST) });
+  // Every N hours: divisors of 24 follow the clock, all other intervals count N real hours (no drift)
   if (rep) triggers.push(unit === "d" ? { trigger: "time", id: "rep", at }
-    : { trigger: "time_pattern", id: "rep", ...([1, 2, 3, 4, 6, 8, 12].includes(cnt) ? { hours: `/${cnt}` } : {}), minutes: 0 });
+    : [1, 2, 3, 4, 6, 8, 12].includes(cnt) ? { trigger: "time_pattern", id: "rep", hours: `/${cnt}`, minutes: 0 }
+    : { trigger: "template", id: "rep", value_template: `{{ now().minute == 0 and (now().timestamp() // 3600) % ${cnt} == 0 }}` });
   const last = "(as_timestamp(now()) - as_timestamp(this.attributes.last_triggered, 0))";
   const cl = ["trigger.id == 'ok' and st == 0"];
-  if (w1.on) cl.push(`trigger.id == 's1' and st == 1 and ${last} >= 600`);
-  if (w2.on) cl.push(`trigger.id == 's2' and st == 2 and ${last} >= 600`);
+  if (w1.on) cl.push("trigger.id == 's1' and st == 1");
+  if (w2.on) cl.push("trigger.id == 's2' and st == 2");
   if (w1.on && w2.on) cl.push("trigger.id == 'u2' and st == 1");
   if (rep) cl.push(`trigger.id == 'rep' and st > 0 and ${last} >= ${Math.max(rep - tol, 0)}`);
   const conditions = [{ condition: "template", value_template: `${SET}{{ ${OK} and (${cl.map((q) => `(${q})`).join(" or ")}) }}` }];
@@ -469,9 +484,9 @@ const fromVars = (v) => ({
   warn_repeat_unit: ENUM.warn_repeat_unit.includes(v.tc_unit) ? v.tc_unit : DEF.warn_repeat_unit,
   warn_auto: true
 });
-const CSS = `
+const CARD_CSS = `
 :host{display:block;height:100%;min-height:240px;container-type:inline-size}
-ha-card{position:relative;height:100%;display:flex;flex-direction:column;gap:10px;padding:10px;box-sizing:border-box;overflow:hidden;container-type:inline-size;font-size:var(--fs,100%);color:var(--primary-text-color);background:radial-gradient(120% 70% at 50% 0,color-mix(in srgb,var(--card-background-color,#1c1c1c) 90%,#fff),var(--card-background-color,#1c1c1c))}
+ha-card{position:relative;height:100%;display:flex;flex-direction:column;gap:10px;padding:10px;box-sizing:border-box;overflow:hidden;container-type:inline-size;font-size:var(--fs,14px);line-height:var(--lh,20px);letter-spacing:normal;color:var(--primary-text-color);background:radial-gradient(120% 70% at 50% 0,color-mix(in srgb,var(--card-background-color,#1c1c1c) 90%,#fff),var(--card-background-color,#1c1c1c))}
 ha-card[tabindex]:focus-visible{outline:2px solid var(--primary-color);outline-offset:-2px}
 .rect{--rad:0 0 6px 6px;--h:14px;--o:var(--sh)}
 .pool{--rad:50%/calc(var(--h)/2);--h:24px;--o:calc(var(--sh)/2)}
@@ -486,9 +501,10 @@ ha-card[tabindex]:focus-visible{outline:2px solid var(--primary-color);outline-o
 .capsule .v{container-type:size}
 .title{text-align:center;font-size:1.6em;font-weight:500}
 .info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4em .8em}
+@container (max-width:55.9em){.info.one{grid-template-columns:1fr}}
 @container (min-width:56em){.info{grid-template-columns:repeat(var(--cols,4),minmax(0,1fr))}}
-.chip{display:flex;justify-content:space-between;gap:.5em;padding:.35em .8em;border-radius:.9em;font-weight:600;white-space:nowrap;container-type:inline-size;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 6px rgba(0,0,0,.25)}
-.chip span{font-size:clamp(.4em,calc((100cqw - .5em)/(var(--chars,16)*.52)),1em)}
+.chip{display:flex;justify-content:space-between;gap:.5em;padding:.35em .8em;border-radius:.9em;font-weight:600;white-space:nowrap;min-width:0;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 6px rgba(0,0,0,.25)}
+.chip span{font-size:calc(var(--s,1)*1em)}
 .chip[hidden]{display:none}
 .chip span:first-child{opacity:.7;font-weight:500;flex:none}
 .tanks{position:relative;flex:1;display:flex;column-gap:clamp(3px,calc(8% / var(--n,3)),24px);min-height:150px;padding:0 1%}
@@ -555,19 +571,17 @@ const waveCss = (s) => `
 class TankCard extends HTMLElement {
   constructor() {
     super();
-    this._hass = this._o = this._els = this._last = this._ro = this._u = this._key = this._th = this._dk = this._hk = this._ht = null;
+    this._hass = this._o = this._els = this._last = this._ro = this._u = this._key = this._th = this._dk = null;
     this._tv = [];
     this._st = 0;
+    this._hk = this._ht = null;
     this._rate = this._cons = null;
     this._refill = this._avg = undefined;
     this._rrows = null;
     this._why = "load";
     this._hi = 0;
     this._hb = false;
-    this._app = false;
-    this._tp = this._tr = this._tm = 0;
-    this._pend = 0;
-    this._ref = null;
+    this._tm = 0;
     this.attachShadow({ mode: "open" });
   }
   static getConfigElement() { return document.createElement("tank-card-pro-editor"); }
@@ -590,10 +604,8 @@ class TankCard extends HTMLElement {
     this._ro?.disconnect();
     clearInterval(this._hi);
     clearTimeout(this._ht);
-    clearTimeout(this._tp);
-    clearTimeout(this._tr);
     clearTimeout(this._tm);
-    this._tp = this._tr = this._tm = 0;
+    this._tm = 0;
   }
   set hass(h) {
     const old = this._hass, o = this._o;
@@ -601,10 +613,7 @@ class TankCard extends HTMLElement {
     if (!old) this._hist();
     if (!o || !old || !h || old.locale !== h.locale || old.themes !== h.themes ||
         old.themes?.darkMode !== h.themes?.darkMode ||
-        (o.id && old.states?.[o.id]?.state !== h.states?.[o.id]?.state)) {
-      this._update();
-      this._watch();
-    }
+        (o.id && old.states?.[o.id]?.state !== h.states?.[o.id]?.state)) this._update();
   }
   setConfig(c) {
     if (!c || typeof c !== "object" || Array.isArray(c)) throw new Error("Invalid Tank Card Pro configuration.");
@@ -615,16 +624,12 @@ class TankCard extends HTMLElement {
     const anim = !PILE[content];
     const id = mode === "consumption" ? cs : ls;
     const ch = Math.round(num(c.card_height, DEF.card_height, 250, 1000));
+    const ks = Object.keys(c), show = Object.fromEntries(INFO.map((i) => [i.id, i.off ? c[i.flag] === true : c[i.flag] !== false]));
     const thr = num(c.refill_threshold, DEF.refill_threshold, 1, 99);
     const hk = JSON.stringify([id, mode, total, fill, c.calc_linear === true, c.calc_seasonal === true, c.detect_refill === true, thr, c.show_avg === true, c.show_yesterday === true, c.show_today === true]);
     this._last = null;
     this._u = null;
     this._st = 0;
-    clearTimeout(this._tp);
-    clearTimeout(this._tr);
-    this._tp = this._tr = 0;
-    this._pend = 0;
-    this._ref = null;
     if (hk !== this._hk) {
       this._hk = hk;
       this._rate = this._cons = null;
@@ -651,7 +656,8 @@ class TankCard extends HTMLElement {
       perTank: c.show_unittank !== false,
       showTitle: c.show_title !== false, showLabel: c.show_tank_label !== false,
       label: typeof c.tank_label === "string" && c.tank_label.trim() ? c.tank_label.trim() : null,
-      show: Object.fromEntries(INFO.map((i) => [i.id, i.off ? c[i.flag] === true : c[i.flag] !== false])),
+      show, order: INFO.filter((i) => show[i.id]).sort((a, b) => ks.indexOf(a.flag) - ks.indexOf(b.flag)),
+      names: Array.from({ length: n }, (_, i) => { const x = c.entities?.[i]?.name, t = typeof x === "string" ? x.trim() : ""; return t && t !== `Tank ${i + 1}` ? t : null; }),
       wave: anim && c.animation === true, interval: num(c.animation_interval, DEF.animation_interval, 5, 60),
       bubbles: anim && c.bubbles === true, amount: Math.round(num(c.bubble_amount, DEF.bubble_amount, 1, 8)),
       form, style, gas: style === "metal" && form === "capsule" && n === 1 && c.gas_tank === true,
@@ -686,15 +692,6 @@ class TankCard extends HTMLElement {
     d.setHours(24, 0, 5, 0);
     this._tm = setTimeout(() => { this._hist(); this._midnight(); }, Math.max(d.getTime() - Date.now(), 1e3));
   }
-  _watch() {
-    // A rise of at least the refill threshold since the last history check: check again soon (at most once per minute)
-    const o = this._o;
-    if (!o?.refill || !o.id || this._ref === null) return;
-    const cur = this._values().cur;
-    if (cur < this._ref) this._ref = cur;
-    if (this._tr || cur - this._ref < o.total * o.refillThr / 100) return;
-    this._tr = setTimeout(() => { this._tr = 0; this._hist(); }, 6e4);
-  }
   _stage(pct) {
     const [w1, w2] = this._o.warn, prev = this._st;
     let s = w2.on && pct < w2.lvl ? 2 : w1.on && pct < w1.lvl ? 1 : 0;
@@ -704,10 +701,7 @@ class TankCard extends HTMLElement {
   _pts(rows) {
     const pts = rows.filter(([t, v]) => Number.isFinite(t) && Number.isFinite(v)).map(([t, v]) => [t, levelAmt(this._o.mode, v, this._o.fill, this._o.total)]).sort((x, y) => x[0] - y[0]);
     if (!pts.length) return null;
-    // The live value is appended with the real time of its last change, so that a refill that is not in the (cached) history yet is dated correctly
-    const cur = this._values().cur, lc = Date.parse(this._hass?.states?.[this._o.id]?.last_changed), now = Date.now();
-    if (lc > pts[pts.length - 1][0] && lc < now) pts.push([lc, cur]);
-    pts.push([Math.max(now, pts[pts.length - 1][0]), cur]);
+    if (Number.isFinite(stNum(this._hass, this._o.id))) pts.push([Math.max(Date.now(), pts[pts.length - 1][0]), this._values().cur]);
     return pts;
   }
   _bins(pts, B) {
@@ -729,32 +723,13 @@ class TankCard extends HTMLElement {
     }
     return out;
   }
-  _runs(pts, lim) {
-    // Merge consecutive rises into one block. Small dips (noise) do not end a block, a longer pause does.
-    // A block counts as refill when its total rise reaches lim. Returns [startIndex, endIndex] pairs.
-    const tol = this._o.total * RUN_TOL / 100, out = [];
-    for (let i = 0; i < pts.length - 1;) {
-      if (pts[i + 1][1] <= pts[i][1]) { i++; continue; }
-      let p = i + 1;
-      for (let j = i + 2; j < pts.length; j++) {
-        if (pts[j][0] - pts[j - 1][0] > RUN_GAP) break;
-        if (pts[j][1] > pts[p][1]) p = j;
-        else if (pts[p][1] - pts[j][1] > tol) break;
-      }
-      if (pts[p][1] - pts[i][1] >= lim) out.push([i, p]);
-      i = p;
-    }
-    return out;
-  }
-  _skips(pts, lim) {
-    const skip = new Uint8Array(pts.length);
-    for (const [a, p] of this._runs(pts, lim)) for (let k = a + 1; k <= p; k++) skip[k] = 1;
-    return skip;
-  }
   _unref(pts) {
-    // Remove refills so that only consumption feeds the trend line
-    const skip = this._skips(pts, this._o.total * .02), out = [pts[0]];
-    for (let i = 1; i < pts.length; i++) out.push([pts[i][0], out[i - 1][1] + (skip[i] ? 0 : pts[i][1] - pts[i - 1][1])]);
+    // Remove refills (jumps up) so that only consumption feeds the trend line
+    const lim = this._o.total * .02, out = [pts[0]];
+    for (let i = 1; i < pts.length; i++) {
+      const d = pts[i][1] - pts[i - 1][1];
+      out.push([pts[i][0], out[i - 1][1] + (d >= lim ? 0 : d)]);
+    }
     return out;
   }
   _slope(pts) {
@@ -769,18 +744,28 @@ class TankCard extends HTMLElement {
     const rate = sxx > 0 ? -sxy / sxx : 0;
     return rate > o.total * 1e-4 ? rate : 0;
   }
-  _lastRefill(pts) {
-    // Only a finished refill counts: the last rise must be at least SETTLE ago. A running refill is remembered in _pend.
-    // Rises that are still running are watched from a quarter of the threshold on (at least 1 % of the total), so the check does not stop too early.
-    const o = this._o, now = Date.now(), lim = o.total * o.refillThr / 100;
-    let t = null;
-    this._pend = 0;
-    if (!pts) return t;
-    for (const [a, p] of this._runs(pts, Math.min(lim, Math.max(lim / 4, o.total * .01)))) {
-      if (now - pts[p][0] < SETTLE) this._pend = pts[p][0];
-      else if (pts[p][1] - pts[a][1] >= lim) t = pts[p][0];
+  _runs(pts, lim) {
+    // Merges consecutive rises into one block (slow refilling in many small steps). Small dips (noise) do not end a block, a longer pause does.
+    // A block counts as refill when its total rise reaches lim. Returns [startIndex, peakIndex] pairs.
+    const tol = this._o.total * RUN_TOL / 100, out = [];
+    for (let i = 0; i < pts.length - 1;) {
+      if (pts[i + 1][1] <= pts[i][1]) { i++; continue; }
+      let p = i + 1;
+      for (let j = i + 2; j < pts.length; j++) {
+        if (pts[j][0] - pts[j - 1][0] > RUN_GAP) break;
+        if (pts[j][1] > pts[p][1]) p = j;
+        else if (pts[p][1] - pts[j][1] > tol) break;
+      }
+      if (pts[p][1] - pts[i][1] >= lim) out.push([i, p]);
+      i = p;
     }
-    return t;
+    return out;
+  }
+  _lastRefill(pts) {
+    const o = this._o;
+    if (!pts) return null;
+    const r = this._runs(pts, o.total * o.refillThr / 100);
+    return r.length ? pts[r[r.length - 1][1]][0] : null;
   }
   async _hist() {
     const o = this._o, h = this._hass, id0 = o?.id;
@@ -797,16 +782,6 @@ class TankCard extends HTMLElement {
           this._cons = o.calcSea ? this._daily(pts) : null;
           this._refill = o.refill ? this._lastRefill(pts) : undefined;
           this._avg = o.show.avg ? this._avgDay(pts) : undefined;
-          if (o.refill) {
-            if (!this._pend) {
-              clearTimeout(this._tp);
-              this._tp = 0;
-              this._ref = this._values().cur;
-            } else if (!this._tp) {
-              // When the waiting time is over, the history is loaded again, so the real end of the refill is known (not only the last change of a flickering sensor)
-              this._tp = setTimeout(() => { this._tp = 0; delete RC[id0]; delete RR[id0]; this._hist(); }, Math.max(SETTLE - (Date.now() - this._pend), 0) + 5e3);
-            }
-          }
         }
         if (recent) this._rrows = rr;
       }
@@ -823,13 +798,14 @@ class TankCard extends HTMLElement {
     else this._update();
   }
   _used(pts, a, b) {
-    // A step that reaches over the border of the period is split in proportion to the time, so rarely updating sensors are not counted fully for one day
-    const skip = this._skips(pts, this._o.total * this._o.refillThr / 100);
-    let sum = 0;
-    for (let i = 1; i < pts.length; i++) {
-      const t1 = pts[i - 1][0], t2 = pts[i][0];
-      if (skip[i] || t2 <= a || t1 >= b) continue;
-      sum += (pts[i - 1][1] - pts[i][1]) * (t2 > t1 ? (Math.min(t2, b) - Math.max(t1, a)) / (t2 - t1) : 1);
+    const lim = this._o.total * this._o.refillThr / 100;
+    let prev = pts[0][1], sum = 0;
+    for (const [t, v] of pts) {
+      if (t <= a) { prev = v; continue; }
+      if (t > b) break;
+      const x = prev - v;
+      if (x > -lim) sum += x;
+      prev = v;
     }
     return Math.max(sum, 0);
   }
@@ -848,7 +824,8 @@ class TankCard extends HTMLElement {
       const [t1, v1] = pts[lo], [t2, v2] = pts[hi];
       return t2 > t1 ? v1 + (v2 - v1) * (t - t1) / (t2 - t1) : v2;
     };
-    const rises = this._runs(pts, lim).map(([s, p]) => [pts[s][0], pts[p][0]]);
+    const rises = [];
+    for (let j = 1; j < pts.length; j++) if (pts[j][1] - pts[j - 1][1] >= lim) rises.push([pts[j - 1][0], pts[j][0]]);
     const d = [], bad = [];
     for (let i = 0; i < n; i++) {
       const t1 = now - (n - i) * DAY, t2 = t1 + DAY, x = at(t1) - at(t2);
@@ -955,6 +932,11 @@ class TankCard extends HTMLElement {
     if (!a) return "-";
     return money(amount * a[1] / p[1] * pr, this._hass?.config?.currency || "EUR", lg);
   }
+  _sym(lg) {
+    // Currency symbol of the Home Assistant system, e.g. € or $
+    const cur = this._hass?.config?.currency || "EUR";
+    try { return new Intl.NumberFormat(lg === "de" ? "de-DE" : "en-US", { style: "currency", currency: cur, currencyDisplay: "narrowSymbol" }).formatToParts(0).find((p) => p.type === "currency").value; } catch { return cur; }
+  }
   _refillTxt(lg) { return this._pre(this._refill !== undefined, lg) || (this._refill === null ? tr(lg, "r_norefill") : this._date(this._refill, lg)); }
   _bubbles() {
     const layer = el("div", "bub"), r = Math.random;
@@ -970,23 +952,29 @@ class TankCard extends HTMLElement {
     this._ro?.disconnect();
     const e = this._els;
     if (!e) return;
-    this._ro = new ResizeObserver(() => { this._ball(); this._fit(); });
+    this._ro = new ResizeObserver(() => { this._ball(); this._labels(); });
     if (this._o.form === "capsule") this._ro.observe(e.tanks[0].w);
     if (e.bar) this._ro.observe(e.bar);
   }
-  _fit() {
-    if (!this._app || !this._els) return;
-    const xs = ["lin", "sea", "refill"].map((id) => this._els.info[id]).filter((x) => x && !x.chip.hidden && x.chip.clientWidth);
-    let min = Infinity, shrink = false;
-    for (const x of xs) {
-      x.v.style.fontSize = "";
-      const cs = getComputedStyle(x.chip), f = parseFloat(getComputedStyle(x.v).fontSize);
-      const avail = x.chip.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - x.l.offsetWidth - (parseFloat(cs.columnGap) || 0) - 1, need = x.v.scrollWidth;
-      const g = avail > 0 && need > avail ? Math.max(f * avail / need, 4) : f;
-      shrink = shrink || g < f;
-      min = Math.min(min, g);
-    }
-    if (shrink) xs.forEach((x) => { x.v.style.fontSize = min + "px"; });
+  _labels() {
+    // Two columns as long as the abbreviated badges fit with a font of at least 65 %; only then one column.
+    // Full label if it fits, else the short form (ab_*); the font shrinks down to .4 em.
+    const lg = lang(this._hass), bar = this._els?.bar, list = bar ? Object.values(this._els.info).filter((x) => !x.chip.hidden) : [];
+    if (!list.length || !bar.clientWidth) return;
+    const cs = getComputedStyle(list[0].chip), pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + (parseFloat(cs.columnGap) || 0);
+    const half = (bar.clientWidth - (parseFloat(getComputedStyle(bar).columnGap) || 0)) / 2 - pad;
+    const w = (x, t) => { x.l.textContent = t; return x.l.offsetWidth + x.v.offsetWidth; };
+    const m = list.map((x) => {
+      x.chip.style.setProperty("--s", 1);
+      const t = tr(lg, x.k).replace("{c}", this._sym(lg)), a = TXT[lg]["ab_" + x.k.slice(2)] || t;
+      return { t, a, wt: w(x, t), wa: w(x, a) };
+    });
+    bar.classList.toggle("one", m.some((q) => half < q.wa * .65));
+    list.forEach((x, i) => {
+      const q = m[i], r = x.chip.clientWidth - pad, f = q.wt <= r;
+      x.l.textContent = f ? q.t : q.a;
+      x.chip.style.setProperty("--s", clamp(r / (f ? q.wt : q.wa), .4, 1));
+    });
   }
   _ball() {
     if (this._o?.form !== "capsule") return;
@@ -1010,10 +998,12 @@ class TankCard extends HTMLElement {
   _build() {
     const o = this._o, [a, b] = o.pal || [];
     const style = el("style");
-    style.textContent = CSS + (o.wave ? waveCss(o.interval) : "") + (o.bubbles ? BUBBLE_CSS : "");
+    style.textContent = CARD_CSS + (o.wave ? waveCss(o.interval) : "") + (o.bubbles ? BUBBLE_CSS : "");
     const bright = o.classic && !o.solid;
     const card = el("ha-card", `${o.form} ${o.style}${o.solid ? " solid" : ""}${bright ? " bright" : ""}${o.wave ? " anim" : ""}`);
-    card.style.setProperty("--fs", o.font + "%");
+    // Absolute base size (HA standard 14px/20px) so the card looks the same in the editor preview and on the dashboard
+    card.style.setProperty("--fs", o.font * .14 + "px");
+    card.style.setProperty("--lh", o.font * .2 + "px");
     card.style.minHeight = this.style.minHeight = o.minH ? o.minH + "px" : "";
     card.style.setProperty("--f", o.solid || (bright ? o.fc : `linear-gradient(to bottom,${a},${b})`));
     card.style.setProperty("--g", (bright ? o.glow : a) || "transparent");
@@ -1027,8 +1017,7 @@ class TankCard extends HTMLElement {
     }
     if (o.showTitle) card.append(el("div", "title", o.title));
     const info = {}, bar = el("div", "info");
-    for (const i of INFO) {
-      if (!o.show[i.id]) continue;
+    for (const i of o.order) {
       const chip = el("div", "chip"), l = el("span"), v = el("span");
       chip.append(l, v);
       bar.append(chip);
@@ -1074,7 +1063,7 @@ class TankCard extends HTMLElement {
     const F2 = (v) => fmt(v, u, lg, Math.max(2, o.dec ?? 0));
     const pct = clamp(cur / total * 100, 0, 100);
     const stage = this._stage(pct);
-    const bad = !o.id ? "e_none" : this._hass && !Number.isFinite(stNum(this._hass, o.id)) ? "e_unav" : "";
+    const bad = o.id && this._hass && !Number.isFinite(stNum(this._hass, o.id)) ? "e_unav" : "";
     const fm = {
       max: F(total), level: F(cur), fill: `${pct.toFixed(0)}%`, cons: F(cons),
       avg: o.show.avg ? this._avgTxt(F2, lg) : "",
@@ -1088,7 +1077,7 @@ class TankCard extends HTMLElement {
     };
     const vt = o.perTank ? F(cur / o.n) : "";
     const theme = (o.theme && this._hass?.themes?.themes?.[o.theme]) || null, dark = !!this._hass?.themes?.darkMode;
-    const key = [lg, stage, bad, pct, fm.max, fm.level, fm.cons, fm.avg, fm.yd, fm.td, fm.lin, fm.sea, fm.refill, fm.cu, fm.cr, vt, inApp(this._hass)].join("|");
+    const key = [lg, stage, bad, pct, vt, ...Object.values(fm)].join("|");
     if (key === this._key && theme === this._th && dark === this._dk) return;
     this._key = key;
     const cs = this._els.card.style;
@@ -1096,14 +1085,11 @@ class TankCard extends HTMLElement {
     this._els.card.classList.toggle("warn2", o.wglow && stage === 2);
     this._els.sens.box.hidden = !bad;
     if (bad) this._els.sens.tx.textContent = tr(lg, bad);
-    this._app = inApp(this._hass);
     for (const [id, x] of Object.entries(this._els.info)) {
-      x.l.textContent = tr(lg, x.k);
       x.v.textContent = fm[id];
       x.chip.hidden = fm[id] === "";
-      x.chip.style.setProperty("--chars", x.l.textContent.length + x.v.textContent.length);
     }
-    if (this._app) requestAnimationFrame(() => this._fit());
+    this._labels();
     if (theme !== this._th || dark !== this._dk) {
       this._th = theme;
       this._dk = dark;
@@ -1115,7 +1101,7 @@ class TankCard extends HTMLElement {
       }
     }
     cs.setProperty("--vc", vt.length || 6);
-    const names = this._els.tanks.map((_, i) => `${o.label ?? tr(lg, "u_tank")} ${i + 1}`);
+    const names = this._els.tanks.map((_, i) => o.names[i] ?? `${o.label ?? tr(lg, "u_tank")} ${i + 1}`);
     cs.setProperty("--lc", Math.max(...names.map((x) => x.length)));
     this._els.tanks.forEach((t, i) => {
       t.nm.textContent = names[i];
@@ -1178,8 +1164,7 @@ class TankCardEditor extends HTMLElement {
       const lv = this._level(d);
       d.refill_to_amount = rnd(Math.max(total * num(d.refill_to_pct, DEF.refill_to_pct, 0, 100) / 100 - lv.cur, 0), decOf(this._un(d)));
     }
-    d.font_size = num(d.font_size, DEF.font_size, 50, 200);
-    d.card_height = num(d.card_height, DEF.card_height, 250, 1000);
+    for (let i = 1; i <= 20; i++) d["tank_name_" + i] = this._c.entities?.[i - 1]?.name ?? "";
     if (!warnOn(d)) d.warn_notify = d.warn_mobile = d.warn_glow = d.warn_auto = false;
     if (!gasOk(d)) d.gas_tank = false;
     for (const k of this._empty) if (BLANK(this._c[k])) d[k] = undefined;
@@ -1205,7 +1190,8 @@ class TankCardEditor extends HTMLElement {
     const sl = (min, max, step, unit) => ({ number: { min, max, step, mode: "slider", unit_of_measurement: unit } });
     const b = (name) => ({ name, selector: { boolean: {} } });
     const g = (name, schema, w) => ({ type: "grid", name, flatten: true, ...(w && { column_min_width: w }), schema });
-    const dd = { mode: "dropdown" }, wOn = warnOn(d), aOn = autoOn(d), pr = { number: { min: 0, step: "any", mode: "box", unit_of_measurement: this._hass?.config?.currency || "EUR" } };
+    const dd = { mode: "dropdown" }, wOn = warnOn(d), aOn = autoOn(d);
+    const pr = { number: { min: 0, step: "any", mode: "box", unit_of_measurement: this._hass?.config?.currency || "EUR" } };
     const lv = this._level(d), maxAmt = lv ? flr(lv.total - lv.cur, decOf(this._un(d))) : undefined;
     const advG = {
       adv_avg: [b("show_avg")], adv_yd: [b("show_yesterday")], adv_td: [b("show_today")],
@@ -1221,6 +1207,7 @@ class TankCardEditor extends HTMLElement {
       cr_pct: d.cost_refill ? [{ name: "refill_to_pct", selector: { number: { min: 0, max: 100, step: "any", mode: "box", unit_of_measurement: "%" } } }] : [],
       cr_amt: d.cost_refill ? [{ name: "refill_to_amount", selector: { number: { min: 0, ...(maxAmt !== undefined && { max: maxAmt }), step: "any", mode: "box", unit_of_measurement: this._un(d) } } }] : []
     };
+    const nt = Math.round(num(d.tank_count, DEF.tank_count, 1, 20));
     return {
       tank: [
         S("tank_form", FORMS, dd),
@@ -1257,7 +1244,8 @@ class TankCardEditor extends HTMLElement {
       w_not: aOn ? [b("warn_notify")] : [],
       w_mob: aOn ? [b("warn_mobile")] : [],
       ...advG,
-      adv: Object.values(advG).flat()
+      adv: Object.values(advG).flat(),
+      names: Array.from({ length: nt }, (_, i) => ({ name: "tank_name_" + (i + 1), selector: { text: {} } }))
     };
   }
   _scroller() {
@@ -1278,14 +1266,16 @@ class TankCardEditor extends HTMLElement {
     this._f = [];
     this._p = [];
     this._q = [];
+    this._on = [];
     const add = (parent, id, sep) => {
       const form = document.createElement("ha-form");
       if (sep) form.classList.add("sep");
-      form.computeLabel = (s) => (s.name === "consumption_sensor" || s.name === "level_sensor" || s.name === "warn_time" ? "" : tr(lang(this._hass), s.name));
+      form.computeLabel = (s) => (s.name === "consumption_sensor" || s.name === "level_sensor" || s.name === "warn_time" ? "" : s.name.startsWith("tank_name_") ? tpl(tr(lang(this._hass), "tank_name"), { n: s.name.slice(10) }) : tr(lang(this._hass), s.name));
       form.computeHelper = (s) => this._help(s);
       form.addEventListener("value-changed", (e) => { e.stopPropagation(); this._changed(e.detail?.value); });
       form.addEventListener("input", (e) => this._live(e));
       if (id === "warn" || id === "w2") form.addEventListener("focusout", () => this._warnBlur());
+      if (["d_h", "d_fs", "animation", "anim_b"].includes(id)) form.addEventListener("focusout", () => this._rangeBlur());
       parent.append(form);
       this._f.push({ id, form, live: LIVE.has(id) });
     };
@@ -1308,9 +1298,9 @@ class TankCardEditor extends HTMLElement {
       this._p.push({ id, p });
       if (id === "warn") { this._n0 = el("div", "note top"); p.append(this._n0); }
       if (id === "content") {
-        q(p, "q_content"); add(p, id); q(p, "q_mode"); add(p, "mode"); q(p, "q_sensor"); add(p, "sensor"); add(p, "unit"); q(p, "q_fill"); add(p, "fill");
+        q(p, "q_content"); add(p, id); q(p, "q_mode", "top"); add(p, "mode"); q(p, "q_sensor", "top"); add(p, "sensor"); q(p, "q_fill", "top"); add(p, "fill"); add(p, "unit", true);
       } else if (id === "display") {
-        add(p, "display"); add(p, "d_label", true); q(p, "q_badges", "top"); add(p, "badges"); add(p, "d_unit"); ["d_liq", "d_h", "d_fs", "d_th"].forEach((k) => add(p, k, true));
+        add(p, "display"); add(p, "d_label", true); ["d_liq", "d_th", "d_fs", "d_h"].forEach((k) => add(p, k, true)); q(p, "q_badges", "top"); add(p, "badges"); { const n = el("div", "note"); this._on.push(n); p.append(n); } add(p, "d_unit");
       } else if (id === "adv") {
         q(p, "q_badges2", "big");
         ["adv_avg", "adv_yd", "adv_td", "adv_lin", "adv_sea", "adv_refill", "adv_cu"].forEach((k, i) => add(p, k, i > 0));
@@ -1320,7 +1310,7 @@ class TankCardEditor extends HTMLElement {
         row("cr_price", "cr_per");
         row("cr_pct", "cr_amt");
       } else add(p, id);
-      if (id === "tank") { add(p, "gas"); this._gn = el("div", "note"); p.append(this._gn); }
+      if (id === "tank") { add(p, "names", true); add(p, "gas", true); this._gn = el("div", "note"); p.append(this._gn); }
       if (id === "animation") add(p, "anim_b", true);
       if (id === "warn") {
         ["w2", "w_glow", "w_auto"].forEach((k) => add(p, k, true));
@@ -1453,6 +1443,7 @@ class TankCardEditor extends HTMLElement {
     this._q.forEach(([h, k]) => { h.textContent = tpl(tr(lg, k), { m: lg === "en" ? sm[0].toLowerCase() + sm.slice(1) : sm }); });
     this._gn.replaceChildren(el("div", "", tr(lg, "i_gas")), el("div", "b", tr(lg, "i_gas_on")));
     this._n0.textContent = tr(lg, "a_order");
+    this._on.forEach((n) => { n.textContent = tr(lg, "n_order"); });
     this._n1.textContent = tr(lg, "a_note");
     this._an.box.hidden = !autoOn(d);
     this._p.forEach(({ id, p }) => {
@@ -1479,6 +1470,12 @@ class TankCardEditor extends HTMLElement {
     if (!blank("warn_2_level") && b !== l2) p.warn_2_level = b;
     return Object.keys(p).length ? p : null;
   }
+  _rangeBlur() {
+    // A number box may be empty or out of range while typing: it is corrected (or reset to the default) when the focus leaves
+    const d = this._data(), p = {};
+    for (const [k, lo, hi] of RANGES) { const v = num(d[k], DEF[k], lo, hi); if (v !== d[k]) p[k] = v; }
+    if (Object.keys(p).length) this._changed({ ...d, ...p }, Object.keys(p));
+  }
   _warnBlur() {
     const d = this._data(), p = this._warnFix(d);
     if (p) this._changed({ ...d, ...p }, Object.keys(p));
@@ -1486,7 +1483,7 @@ class TankCardEditor extends HTMLElement {
   _changed(value, fixed, imp) {
     if (!value || typeof value !== "object") return;
     const next = { ...value }, reset = [];
-    for (const k of ["title", "tank_label", "tank_count", "tank_capacity", "initial_fill", "decimals", "warn_1_level", "warn_2_level", "warn_repeat", "refill_threshold", "cost_used_price", "cost_refill_price", "refill_to_pct"]) {
+    for (const k of ["title", "tank_label", "tank_count", "tank_capacity", "initial_fill", "decimals", "card_height", "font_size", "animation_interval", "bubble_amount", "warn_1_level", "warn_2_level", "warn_repeat", "refill_threshold", "cost_used_price", "cost_refill_price", "refill_to_pct"]) {
       if (!BLANK(next[k])) this._empty.delete(k);
       else { if (k in value) this._empty.add(k); delete next[k]; }
     }
@@ -1531,7 +1528,29 @@ class TankCardEditor extends HTMLElement {
       }
     }
     for (const k of PERK) next[k] = perFix(next[k] ?? DEF[k], this._un({ ...DEF, ...next }));
-    for (const k in next) if (k in DEF && JSON.stringify(next[k]) === JSON.stringify(DEF[k])) delete next[k];
+    // Names of the single tanks are stored as entities[i].name
+    const nm = [];
+    for (let i = 1; i <= 20; i++) {
+      const k = "tank_name_" + i;
+      if (k in next) { nm[i - 1] = typeof next[k] === "string" ? next[k].trim() : ""; delete next[k]; }
+    }
+    if (nm.length) {
+      const old = Array.isArray(this._c.entities) ? this._c.entities : [], ent = [];
+      for (let i = 0; i < Math.max(nm.length, old.length); i++) {
+        const e = { ...(old[i] || {}) };
+        if (nm[i]) e.name = nm[i]; else if (i < nm.length) delete e.name;
+        ent.push(e);
+      }
+      while (ent.length && !Object.keys(ent[ent.length - 1]).length) ent.pop();
+      if (ent.length) next.entities = ent; else delete next.entities;
+    }
+    // Chip order = order in which the chips were switched on: the flags are moved to the end of the config when switched on
+    const on = (c, i) => (i.off ? c[i.flag] === true : c[i.flag] !== false), turned = INFO.filter((i) => on(next, i) && !on(this._c, i)).map((i) => i.flag);
+    const keep = Object.keys(this._c).filter((k) => CHIPS.has(k) && !turned.includes(k)).concat(turned), vals = {};
+    for (const i of INFO) { vals[i.flag] = next[i.flag]; delete next[i.flag]; }
+    for (const k of keep) next[k] = vals[k];
+    for (const i of INFO) if (!(i.flag in next) && vals[i.flag] !== DEF[i.flag]) next[i.flag] = vals[i.flag];
+    for (const k in next) if (k in DEF && JSON.stringify(next[k]) === JSON.stringify(DEF[k]) && !(keep.includes(k) && next[k] === true)) delete next[k];
     const out = sortCfg(next);
     this._c = out;
     this._info = "";
