@@ -2,6 +2,16 @@
 
 All notable changes to **Tank Card Pro** are documented in this file.
 
+## [0.9.6] - 2026-10-29
+
+### Changed
+- Minor visual refinements and UI polish.
+- Improved consistency of the card's appearance.
+
+### Fixed
+- Fixed minor bugs and visual inconsistencies.
+- General stability and rendering improvements.
+
 ## [0.9.5] - 2026-10-28
 
 ### Added
