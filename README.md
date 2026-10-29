@@ -10,7 +10,17 @@
 
 **Tank Card Pro** is the extended edition of the free [Tank Card](https://github.com/jinx-22/tank-card) everything the basic card can do, plus the **advanced settings** (average and daily consumption, range forecasts, refill detection and costs).
 
-**Current version: 0.9.5**
+**Current version: 0.9.6**
+
+## 🆕 0.9.6
+
+### Changed
+- Minor visual refinements and UI polish.
+- Improved consistency of the card's appearance.
+
+### Fixed
+- Fixed minor bugs and visual inconsistencies.
+- General stability and rendering improvements.
 
 ## 🆕 0.9.5
 
