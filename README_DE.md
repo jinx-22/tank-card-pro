@@ -10,32 +10,28 @@
 
 **Tank Card Pro** ist die erweiterte Ausgabe der kostenlosen [Tank Card](https://github.com/jinx-22/tank-card) Alles, was die einfache Karte kann, plus die **erweiterten Einstellungen** (Durchschnitts- und Tagesverbrauch, Reichweite, Nachfüllerkennung und Kosten).
 
-**Aktuelle Version: 0.9.6**
+**Aktuelle Version: 0.9.7**
 
-## 🆕 0.9.6
+## 🆕 0.9.7
 
-### Geändert
-- Kleinere optische Verbesserungen und Feinschliff der Benutzeroberfläche.
-- Einheitlicheres Erscheinungsbild der Karte.
+### Neu
+- **Individuelle Tank-Kapazitäten** (Discussion #8): Bei mehreren Tanks kann jeder Tank eine eigene Kapazität haben.
+  Im Panel "Tank" den Schalter "Tanks mit unterschiedlichen Kapazitäten" einschalten und die Kapazität bei den Tanknamen eingeben.
+- Die Tanks werden proportional zur Kapazität unterschiedlich breit dargestellt, alle mit gleicher Füllhöhe.
+  Die Menge pro Tank ist Füllstand × Kapazität (z. B. 2400 / 2200 / 2200 L bei 50 % → 1200 / 1100 / 1100 L).
+- Die Gesamtkapazität ist die Summe aller Tanks. Chips, Prognose, Warnstufen und Automation rechnen damit.
+- YAML: `tank_diff_capacity: true` und `capacity` je Eintrag in `entities`.
 
-### Behoben
-- Kleinere Fehler und optische Unstimmigkeiten behoben.
-- Allgemeine Verbesserungen der Stabilität und Darstellung.
+### Verbessert
+- Editor: Anzahl und Kapazität stehen in einer Zeile (50 / 50), auch auf kleinen Bildschirmen.
+- Kapsel-Form: Die Glanzpunkte werden pro Tank berechnet.
+- Editor-Performance: Beim Tippen und Ziehen von Schiebereglern aktualisiert sich die Vorschau nach einer kurzen Pause,
+  und Formularfelder werden nicht mehr unnötig neu aufgebaut.
 
-## 🆕 0.9.5
-
-- Erste Version der **Tank Card Pro** mit dem Bereich **Erweiterte Einstellungen**: Durchschnittsverbrauch pro Tag, Verbrauch gestern / heute, lineare und saisonale Reichweite, Nachfüllerkennung, Kosten des bisherigen Verbrauchs und Kosten der Neubefüllung – siehe [Erweiterte Einstellungen](#-erweiterte-einstellungen)
-- Die Pro-Schilder haben kurze Texte („Ø/Tag“, „Gestern“, „Heute“) und nutzen das Währungszeichen deines Home-Assistant-Systems („€ bisher“, „€ Füllung“)
-- Editor-Vorschau und Dashboard sehen jetzt gleich aus: Die Karte nutzt eine feste Basisschrift (14 px / 20 px, skaliert mit `font_size`), statt sie vom umgebenden Dialog zu erben
-- Schilder (Badges): Die Bezeichnungen werden ausgeschrieben und nur bei Platzmangel abgekürzt, danach wird die Schrift bis auf 0,4 em verkleinert. Jedes Schild wird einzeln angepasst. Bei großer Schrift oder schmaler Karte schalten die Schilder automatisch auf eine Spalte um
-- Die Schilder erscheinen in der **Reihenfolge, in der du sie aktivierst** (Hinweis im Editor). Bestehende Karten: ein Schild einmal aus- und wieder einschalten, um es einzusortieren
-- Warnschild **Sensor nicht verfügbar** (nur bei gewähltem Sensor, nie im Karten-Picker); der Karten-Picker zeigt halbvolle Tanks
-- Einzelne Tank-Namen wieder über `entities[].name` – im Editor gibt es dafür direkt unter der Tank-Anzahl ein Eingabefeld pro Tank
-- Editor: Trennlinien zwischen allen Blöcken, neue Reihenfolge in den Bereichen **Anzeige** und **Inhalt** (Anfangsbestand direkt nach dem Sensor), die Zahlenfelder der Schieberegler (Kartenhöhe, Schriftgröße, Wellen-Intervall, Blasen) lassen sich frei eintippen, ohne zurückzuspringen, automatische Korrektur der Warnstufen, Hilfetexte fallen auf Englisch zurück
-- Die Konfiguration bleibt aufgeräumt: Standardwerte werden entfernt, die Schlüssel sind sortiert
-- Benachrichtigungs-Automation: keine Zeitsperre mehr (ein Rückgang von Stufe 1 auf Stufe 2 wird immer gemeldet), die Push-Nachricht der vorherigen Stufe wird auf dem Handy entfernt, exakter Abstand bei jeder Stundenzahl, die Werte werden in der Automation gespeichert und lassen sich in den Editor zurücklesen, die Einheit im Meldungstext wird bereinigt
-- Warnstufe 2 kann nicht mehr unter 1 % fallen
-- Deutscher Editor: „Design“ statt „Theme“
+### Hinweise
+- Bestehende Konfigurationen bleiben unverändert. Ohne Schalter gilt `tank_capacity` wie bisher für alle Tanks.
+- Beim Ausschalten bleiben die Einzelwerte in der Konfiguration erhalten, werden aber ignoriert.
+- Die Kapazitäten ändern nur die Breite der Tanks. Unterschiedliche Tankhöhen sind nicht Teil dieser Version.
 
 <img width="50%" height="auto" alt="Pro" src="https://github.com/user-attachments/assets/596e040d-042c-4bf0-8251-bf964e2c96dc" />
 
