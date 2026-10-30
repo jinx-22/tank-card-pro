@@ -45,7 +45,7 @@ const TXT = {
     n_title: "Tank warning – level {s}", n_channel: "Tank warning", n_msg: "{t}: warning level {s} – level below {l} %. Now {p} % ({c} of {m}).",
     e_unav: "Sensor unavailable",
     q_badges: "Display badges", n_order: "Sorted in the order of activation.",
-    s_adv: "Advanced settings", q_badges2: "More display badges", tank_name: "Name of tank {n}:",
+    s_adv: "Advanced settings", q_badges2: "More display badges", tank_name: "Name of tank {n}:", tank_diff_capacity: "Tanks with different capacities", tank_total: "Total capacity", tank_cap: "Capacity", h_tank_diff_capacity: "Enter the capacity of each tank next to its name. The tanks are drawn with different widths.",
     show_avg: "Show average consumption per day", show_yesterday: "Show consumption yesterday", show_today: "Show consumption today",
     calc_linear: "Calculate linear range", calc_linear_format: "Show as",
     calc_seasonal: "Calculate seasonal range", calc_seasonal_format: "Show as",
@@ -122,7 +122,7 @@ const TXT = {
     n_title: "Tank-Warnung – Stufe {s}", n_channel: "Tank-Warnung", n_msg: "{t}: Warnstufe {s} – Füllstand unter {l} %. Aktuell {p} % ({c} von {m}).",
     e_unav: "Sensor nicht verfügbar",
     q_badges: "Anzeige-Schilder/Badges", n_order: "Sortierung nach Reihenfolge der Aktivierung.",
-    s_adv: "Erweiterte Einstellungen", q_badges2: "Weitere Anzeige-Schilder / Badges", tank_name: "Name Tank {n}:",
+    s_adv: "Erweiterte Einstellungen", q_badges2: "Weitere Anzeige-Schilder / Badges", tank_name: "Name Tank {n}:", tank_diff_capacity: "Tanks mit unterschiedlichen Kapazitäten", tank_total: "Gesamtkapazität", tank_cap: "Kapazität", h_tank_diff_capacity: "Die Kapazität jedes Tanks bei den Tanknamen eingeben. Die Tanks werden unterschiedlich breit dargestellt.",
     show_avg: "Durchschnittsverbrauch pro Tag anzeigen", show_yesterday: "Verbrauch gestern anzeigen", show_today: "Verbrauch heute anzeigen",
     calc_linear: "Reichweite linear berechnen", calc_linear_format: "Anzeigen als",
     calc_seasonal: "Reichweite saisonal berechnen", calc_seasonal_format: "Anzeigen als",
@@ -195,7 +195,7 @@ const INFO = [
 ];
 const CHIPS = new Set(INFO.map((i) => i.flag));
 const DEF = {
-  title: "Tank Card Pro", tank_form: "rect", tank_style: "metal", gas_tank: false, tank_count: 3, tank_capacity: 1500, content_type: "heating_oil", custom_color: [33, 150, 243], liquid_style: "classic", sensor_mode: "consumption", unit: "auto",
+  title: "Tank Card Pro", tank_form: "rect", tank_style: "metal", gas_tank: false, tank_count: 3, tank_capacity: 1500, tank_diff_capacity: false, content_type: "heating_oil", custom_color: [33, 150, 243], liquid_style: "classic", sensor_mode: "consumption", unit: "auto",
   show_max: true, show_current: true, show_fill_level: true, show_consumption: true, show_unittank: true, show_title: true, show_tank_label: true, tank_label: "Tank",
   animation: false, animation_interval: 30, bubbles: false, bubble_amount: 3, font_size: 100, card_height: 350,
   warn_1: false, warn_1_level: 20, warn_2: false, warn_2_level: 10, warn_notify: true, warn_mobile: false, warn_glow: false, warn_auto: false, warn_repeat: 1, warn_repeat_unit: "d", warn_time: "14:00:00",
@@ -219,7 +219,7 @@ const statRows = async (h, id, start, end, period) => {
     return (res?.[id] || []).map((r) => [typeof r.start === "number" ? r.start : Date.parse(r.start), Number.parseFloat(r.state ?? r.mean)]);
   } catch { return []; }
 };
-const ORDER = ["type", "tank_form", "tank_style", "gas_tank", "tank_count", "tank_capacity", "entities", "sensor_mode", "consumption_sensor", "level_sensor", "initial_fill", "content_type", "custom_color", "unit", "decimals",
+const ORDER = ["type", "tank_form", "tank_style", "gas_tank", "tank_count", "tank_capacity", "tank_diff_capacity", "entities", "sensor_mode", "consumption_sensor", "level_sensor", "initial_fill", "content_type", "custom_color", "unit", "decimals",
   "show_title", "title", "show_tank_label", "tank_label", "@chips", "show_unittank", "liquid_style", "card_height", "font_size", "theme",
   "animation", "animation_interval", "bubbles", "bubble_amount",
   "warn_1", "warn_1_level", "warn_2", "warn_2_level", "warn_glow", "warn_auto", "warn_time", "warn_repeat", "warn_repeat_unit", "warn_notify", "warn_mobile",
@@ -281,7 +281,14 @@ const num = (v, d, min = -Infinity, max = Infinity) => {
 };
 const BLANK = (v) => v == null || v === "" || (typeof v === "number" && Number.isNaN(v));
 const totalOf = (n, c) => Math.round(n * c * 100) / 100;
+const capsOf = (n, c) => { const g = num(c.tank_capacity, DEF.tank_capacity, .01); return Array.from({ length: n }, (_, i) => c.tank_diff_capacity === true && n >= 2 ? num(c.entities?.[i]?.capacity, g, .01) : g); };
+const avgCap = (c) => {
+  if (c.tank_diff_capacity !== true) return c;
+  const n = Math.round(num(c.tank_count, DEF.tank_count, 1, 20));
+  return n < 2 ? c : { ...c, tank_count: n, tank_capacity: capsOf(n, c).reduce((x, y) => x + y, 0) / n };
+};
 const core = (c) => {
+  c = avgCap(c);
   const n = Math.round(num(c.tank_count, DEF.tank_count, 1, 20)), total = totalOf(n, num(c.tank_capacity, DEF.tank_capacity, .01));
   const w = [1, 2].map((k) => ({ on: c["warn_" + k] === true, lvl: num(c["warn_" + k + "_level"], DEF["warn_" + k + "_level"], 1, 99) }));
   if (w[0].on && w[1].on) w[1].lvl = Math.max(Math.min(w[1].lvl, w[0].lvl - 1), 1);
@@ -509,6 +516,7 @@ ha-card[tabindex]:focus-visible{outline:2px solid var(--primary-color);outline-o
 .chip span:first-child{opacity:.7;font-weight:500;flex:none}
 .tanks{position:relative;flex:1;display:flex;column-gap:clamp(3px,calc(8% / var(--n,3)),24px);min-height:150px;padding:0 1%}
 .t{position:relative;z-index:1;isolation:isolate;flex:1;min-width:0;display:flex;flex-direction:column;padding-bottom:16px;container-type:inline-size}
+.dc .t{flex-grow:var(--cap,1)}
 .t::after{content:"";position:absolute;z-index:-1;left:-6%;right:-6%;bottom:0;height:24px;background:radial-gradient(ellipse at 50% 40%,rgba(0,0,0,.55),transparent 70%);filter:blur(2px)}
 .n{text-align:center;font-weight:500;line-height:1.2;font-size:max(.3em,min(1.1em,calc(72cqw/(var(--lc,8)*.62))));margin-bottom:.3em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .v{position:relative;z-index:1;flex:1;min-height:100px;overflow:hidden;border-radius:var(--rad);background:linear-gradient(90deg,rgba(255,255,255,.2),rgba(255,255,255,.03) 28%,rgba(255,255,255,.03) 70%,rgba(0,0,0,.25)),rgba(120,130,140,.18);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35),inset 0 -14px 22px rgba(0,0,0,.4),inset 0 10px 18px rgba(255,255,255,.1)}
@@ -649,6 +657,7 @@ class TankCard extends HTMLElement {
       calcSea: c.calc_seasonal === true, seaFmt: e("calc_seasonal_format"),
       cuPrice: num(c.cost_used_price, null, 0), cuPer: e("cost_used_per"), crPrice: num(c.cost_refill_price, null, 0), crPer: e("cost_refill_per"), crTo: num(c.refill_to_pct, DEF.refill_to_pct, 0, 100),
       refill: c.detect_refill === true, refillThr: thr,
+      caps: c.tank_diff_capacity === true && n >= 2 ? capsOf(n, c) : null,
       warn: [w1, w2], wglow: c.warn_glow === true,
       title: typeof c.title === "string" && c.title ? c.title : DEF.title,
       unit: typeof c.unit === "string" && c.unit.trim() ? c.unit.trim() : DEF.unit,
@@ -954,6 +963,7 @@ class TankCard extends HTMLElement {
     if (!e) return;
     this._ro = new ResizeObserver(() => { this._ball(); this._labels(); });
     if (this._o.form === "capsule") this._ro.observe(e.tanks[0].w);
+    if (this._o.form === "capsule" && this._o.caps) e.tanks.slice(1).forEach((t) => this._ro.observe(t.w));
     if (e.bar) this._ro.observe(e.bar);
   }
   _labels() {
@@ -995,6 +1005,26 @@ class TankCard extends HTMLElement {
     px("--br", 1.5 * BALL.size * s);
     px("--bx", Math.max(.12, (wide ? .6 : .3) + BALL.shift) * s);
     px("--by", (wide ? .3 : .6) * s);
+    this._ballT();
+  }
+  _ballT() {
+    if (!this._o.caps) return;
+    for (const { t, v, w } of this._els.tanks) {
+      if (!w.clientWidth || !w.clientHeight) continue;
+      const a = w.clientWidth, h = w.clientHeight, s = Math.min(a, h), L = Math.max(a, h), wide = v.clientWidth > v.clientHeight, st = t.style;
+      const px = (n, x) => st.setProperty(n, x.toFixed(1) + "px");
+      const bar = (n, p, q, len, th) => {
+        px(`--${n}x`, wide ? p : q); px(`--${n}y`, wide ? q : p);
+        px(`--${n}w`, wide ? len : th); px(`--${n}h`, wide ? th : len);
+      };
+      bar("g1", .22 * s, .13 * s, Math.max(.32 * s, L - .72 * s), .1 * s);
+      bar("g2", .3 * s, .785 * s, Math.max(.24 * s, L - .6 * s), .045 * s);
+      px("--gb", .03 * s); px("--gb2", .018 * s);
+      st.setProperty("--ga", wide ? "90deg" : "180deg");
+      px("--br", 1.5 * BALL.size * s);
+      px("--bx", Math.max(.12, (wide ? .6 : .3) + BALL.shift) * s);
+      px("--by", (wide ? .3 : .6) * s);
+    }
   }
   _build() {
     const o = this._o, [a, b] = o.pal || [];
@@ -1030,9 +1060,11 @@ class TankCard extends HTMLElement {
     }
     const tanksEl = el("div", "tanks"), tanks = [];
     tanksEl.style.setProperty("--n", o.n);
+    if (o.caps) tanksEl.classList.add("dc");
     for (let i = 0; i < o.n; i++) {
       const t = el("div", "t"), nm = el("div", "n"), v = el("div", "v"), w = el("div", "w"), l = el("div", "l"), val = el("div", "val");
       t.style.setProperty("--wd", (i * .35).toFixed(2) + "s");
+      if (o.caps) t.style.setProperty("--cap", o.caps[i]);
       if (o.bubbles) l.append(this._bubbles());
       w.append(l, val);
       if (o.form === "capsule") w.append(el("i", "gl g1"), el("i", "gl g2"));
@@ -1042,7 +1074,7 @@ class TankCard extends HTMLElement {
       t.append(v);
       if (o.gas) { const f = el("div", "feet"); f.append(el("i"), el("i")); t.append(f); }
       tanksEl.append(t);
-      tanks.push({ nm, v, w, val });
+      tanks.push({ nm, v, w, val, t });
     }
     card.append(tanksEl);
     const sens = el("div", "sens"), sbox = el("div", "sbox"), stx = el("div");
@@ -1078,6 +1110,7 @@ class TankCard extends HTMLElement {
       cr: o.show.cr ? this._cost(lg, Math.max(total * o.crTo / 100 - cur, 0), o.crPrice, o.crPer, u) : ""
     };
     const vt = o.perTank ? F(cur / o.n) : "";
+    const vts = o.caps && o.perTank ? o.caps.map((q) => F(cur * q / total)) : null;
     const theme = (o.theme && this._hass?.themes?.themes?.[o.theme]) || null, dark = !!this._hass?.themes?.darkMode;
     const key = [lg, stage, bad, pct, vt, ...Object.values(fm)].join("|");
     if (key === this._key && theme === this._th && dark === this._dk) return;
@@ -1103,6 +1136,7 @@ class TankCard extends HTMLElement {
       }
     }
     cs.setProperty("--vc", vt.length || 6);
+    if (vts) cs.setProperty("--vc", Math.max(...vts.map((x) => x.length)) || 6);
     const names = this._els.tanks.map((_, i) => o.names[i] ?? `${o.label ?? tr(lg, "u_tank")} ${i + 1}`);
     cs.setProperty("--lc", Math.max(...names.map((x) => x.length)));
     this._els.tanks.forEach((t, i) => {
@@ -1111,6 +1145,7 @@ class TankCard extends HTMLElement {
       t.v.classList.toggle("e", pct <= 0);
       t.val.textContent = vt;
     });
+    if (vts) this._els.tanks.forEach((t, i) => { t.val.textContent = vts[i]; });
   }
 }
 class TankCardEditor extends HTMLElement {
@@ -1128,7 +1163,7 @@ class TankCardEditor extends HTMLElement {
     this._empty = new Set();
     this.attachShadow({ mode: "open" });
   }
-  disconnectedCallback() { clearTimeout(this._t); clearTimeout(this._ct); cancelAnimationFrame(this._raf); this._t = this._ct = null; }
+  disconnectedCallback() { this._flush(); clearTimeout(this._t); clearTimeout(this._ct); cancelAnimationFrame(this._raf); this._t = this._ct = null; }
   set hass(h) {
     const changed = lang(this._hass) !== lang(h), first = !this._hass;
     this._hass = h;
@@ -1137,7 +1172,17 @@ class TankCardEditor extends HTMLElement {
     if (changed) this._sync();
     else this._f.forEach((x) => { if (x.live) x.form.hass = h; });
   }
+  _flush() {
+    if (!this._pt) return;
+    clearTimeout(this._pt);
+    this._go?.();
+  }
   setConfig(c) {
+    // Pending input: the config handed back is older than ours. Same config as the last one we sent: nothing to redo.
+    if (this._pt) return;
+    const cj = JSON.stringify(c || {});
+    if (this._f && cj === this._cj) return;
+    this._cj = cj;
     this._c = { ...(c || {}) };
     for (const k of this._empty) if (!BLANK(this._c[k])) this._empty.delete(k);
     if (!this._f) this._build();
@@ -1145,6 +1190,7 @@ class TankCardEditor extends HTMLElement {
     this._need();
   }
   _total(d) {
+    if (Number.isFinite(Number(d.tank_count))) d = avgCap(d);
     const n = Number(d.tank_count), c = Number(d.tank_capacity);
     return Number.isFinite(n) && Number.isFinite(c) && n >= 1 && c > 0 ? totalOf(clamp(Math.round(n), 1, 20), c) : null;
   }
@@ -1167,6 +1213,9 @@ class TankCardEditor extends HTMLElement {
       d.refill_to_amount = rnd(Math.max(total * num(d.refill_to_pct, DEF.refill_to_pct, 0, 100) / 100 - lv.cur, 0), decOf(this._un(d)));
     }
     for (let i = 1; i <= 20; i++) d["tank_name_" + i] = this._c.entities?.[i - 1]?.name ?? "";
+    const gc = num(d.tank_capacity, DEF.tank_capacity, .01);
+    for (let i = 1; i <= 20; i++) d["tank_cap_" + i] = this._c.entities?.[i - 1]?.capacity ?? gc;
+    d.tank_total = total;
     if (!warnOn(d)) d.warn_notify = d.warn_mobile = d.warn_glow = d.warn_auto = false;
     if (!gasOk(d)) d.gas_tank = false;
     for (const k of this._empty) if (BLANK(this._c[k])) d[k] = undefined;
@@ -1214,7 +1263,7 @@ class TankCardEditor extends HTMLElement {
       tank: [
         S("tank_form", FORMS, dd),
         S("tank_style", STYLES, dd),
-        g("tank_size", [{ name: "tank_count", selector: nb(1, 20) }, { name: "tank_capacity", selector: nb(.01, undefined, "any") }])
+        g("tank_size", [{ name: "tank_count", selector: nb(1, 20) }, { name: "tank_capacity", selector: nb(.01, undefined, "any") }], "110px")
       ],
       gas: [{ ...b("gas_tank"), disabled: !gasOk(d) }],
       content: [
@@ -1272,9 +1321,11 @@ class TankCardEditor extends HTMLElement {
     const add = (parent, id, sep) => {
       const form = document.createElement("ha-form");
       if (sep) form.classList.add("sep");
-      form.computeLabel = (s) => (s.name === "consumption_sensor" || s.name === "level_sensor" || s.name === "warn_time" ? "" : s.name.startsWith("tank_name_") ? tpl(tr(lang(this._hass), "tank_name"), { n: s.name.slice(10) }) : tr(lang(this._hass), s.name));
+      form.computeLabel = (s) => (s.name === "consumption_sensor" || s.name === "level_sensor" || s.name === "warn_time" ? "" : s.name.startsWith("tank_name_") ? tpl(tr(lang(this._hass), "tank_name"), { n: s.name.slice(10) }) : s.name.startsWith("tank_cap_") ? tr(lang(this._hass), "tank_cap") : tr(lang(this._hass), s.name));
       form.computeHelper = (s) => this._help(s);
       form.addEventListener("value-changed", (e) => { e.stopPropagation(); this._changed(e.detail?.value); });
+      form.addEventListener("input", () => { this._ty = performance.now(); }, true);
+      form.addEventListener("focusout", () => this._flush());
       form.addEventListener("input", (e) => this._live(e));
       if (id === "warn" || id === "w2") form.addEventListener("focusout", () => this._warnBlur());
       if (["d_h", "d_fs", "animation", "anim_b"].includes(id)) form.addEventListener("focusout", () => this._rangeBlur());
@@ -1440,7 +1491,15 @@ class TankCardEditor extends HTMLElement {
     const lg = lang(this._hass), d = this._data(), sc = this._schemas(d, lg);
     this._shown = d.initial_fill;
     this._shownAmt = d.refill_to_amount;
-    this._f.forEach(({ id, form }) => { form.hass = this._hass; form.data = d; form.schema = sc[id]; form.hidden = !sc[id].length; });
+    this._tankSchema(sc, d);
+    this._f.forEach(({ id, form }) => {
+      form.hass = this._hass;
+      form.data = d;
+      // Only hand over a changed schema: a new schema makes ha-form rebuild all its fields
+      const sj = JSON.stringify(sc[id]);
+      if (form._sj !== sj) { form._sj = sj; form.schema = sc[id]; }
+      form.hidden = !sc[id].length;
+    });
     const sm = tr(lg, "o_" + d.sensor_mode);
     this._q.forEach(([h, k]) => { h.textContent = tpl(tr(lg, k), { m: lg === "en" ? sm[0].toLowerCase() + sm.slice(1) : sm }); });
     this._gn.replaceChildren(el("div", "", tr(lg, "i_gas")), el("div", "b", tr(lg, "i_gas_on")));
@@ -1454,6 +1513,14 @@ class TankCardEditor extends HTMLElement {
       if (p.hidden) p.expanded = false;
     });
     this._arender();
+  }
+  _tankSchema(sc, d) {
+    const nt = Math.round(num(d.tank_count, DEF.tank_count, 1, 20)), dc = d.tank_diff_capacity === true && nt >= 2;
+    const nx = { number: { min: 0, step: "any", mode: "box", unit_of_measurement: this._un(d) } };
+    const row = sc.tank.find((x) => x.name === "tank_size");
+    if (row && dc) row.schema = [row.schema[0], { name: "tank_total", selector: nx, disabled: true }];
+    if (nt >= 2) sc.tank.push({ name: "tank_diff_capacity", selector: { boolean: {} } });
+    if (dc) sc.names = Array.from({ length: nt }, (_, i) => ({ type: "grid", name: "tank_row_" + (i + 1), flatten: true, column_min_width: "110px", schema: [{ name: "tank_name_" + (i + 1), selector: { text: {} } }, { name: "tank_cap_" + (i + 1), selector: nx }] }));
   }
   _live(e) {
     const inp = e.composedPath().find((n) => n instanceof HTMLInputElement && n.type === "color");
@@ -1485,6 +1552,16 @@ class TankCardEditor extends HTMLElement {
   _changed(value, fixed, imp) {
     if (!value || typeof value !== "object") return;
     const next = { ...value }, reset = [];
+    const cp = [];
+    for (let i = 1; i <= 20; i++) {
+      const k = "tank_cap_" + i;
+      if (!(k in next)) continue;
+      const v = Number(next[k]);
+      if (BLANK(next[k])) this._empty.add(k); else this._empty.delete(k);
+      cp[i - 1] = !BLANK(next[k]) && v > 0 ? Math.round(v * 100) / 100 : null;
+      delete next[k];
+    }
+    delete next.tank_total;
     for (const k of ["title", "tank_label", "tank_count", "tank_capacity", "initial_fill", "decimals", "card_height", "font_size", "animation_interval", "bubble_amount", "warn_1_level", "warn_2_level", "warn_repeat", "refill_threshold", "cost_used_price", "cost_refill_price", "refill_to_pct"]) {
       if (!BLANK(next[k])) this._empty.delete(k);
       else { if (k in value) this._empty.add(k); delete next[k]; }
@@ -1541,6 +1618,9 @@ class TankCardEditor extends HTMLElement {
       for (let i = 0; i < Math.max(nm.length, old.length); i++) {
         const e = { ...(old[i] || {}) };
         if (nm[i]) e.name = nm[i]; else if (i < nm.length) delete e.name;
+        if (next.tank_diff_capacity === true && i < Math.round(num(next.tank_count ?? this._c.tank_count, DEF.tank_count, 1, 20)) && i < cp.length) {
+          if (cp[i] !== null) e.capacity = cp[i]; else delete e.capacity;
+        }
         ent.push(e);
       }
       while (ent.length && !Object.keys(ent[ent.length - 1]).length) ent.pop();
@@ -1556,15 +1636,25 @@ class TankCardEditor extends HTMLElement {
     const out = sortCfg(next);
     this._c = out;
     this._info = "";
-    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: out }, bubbles: true, composed: true }));
-    this._sync();
-    this._need();
-    if (reset.length) {
-      const e = Object.fromEntries(reset.map((k) => [k, undefined]));
-      this._f.forEach(({ form }) => { form.data = { ...this._data(), ...e }; });
-      clearTimeout(this._t);
-      this._t = setTimeout(() => { this._t = null; this._f?.forEach(({ form }) => { form.data = this._data(); }); }, 40);
-    }
+    // While typing (or dragging a slider) the preview and the form are updated only after a short pause
+    const typing = !!this._ty && performance.now() - this._ty < 100;
+    if (this._rs) reset.push(...this._rs);
+    this._rs = reset;
+    const go = () => {
+      this._pt = this._go = this._rs = null;
+      this._cj = JSON.stringify(this._c);
+      this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._c }, bubbles: true, composed: true }));
+      this._sync();
+      this._need();
+      if (reset.length) {
+        const e = Object.fromEntries(reset.map((k) => [k, undefined]));
+        this._f.forEach(({ form }) => { form.data = { ...this._data(), ...e }; });
+        clearTimeout(this._t);
+        this._t = setTimeout(() => { this._t = null; this._f?.forEach(({ form }) => { form.data = this._data(); }); }, 40);
+      }
+    };
+    clearTimeout(this._pt);
+    if (typing) { this._go = go; this._pt = setTimeout(go, 300); } else go();
   }
 }
 if (!customElements.get("tank-card-pro")) customElements.define("tank-card-pro", TankCard);
