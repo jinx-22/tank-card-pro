@@ -2,6 +2,41 @@
 
 All notable changes to **Tank Card Pro** are documented in this file.
 
+## [0.9.7] - 2026-10-30
+
+### New
+- **Individual tank capacities** (Discussion #8): in multi-tank setups every tank can now have its own capacity.
+  Turn on "Tanks with different capacities" in the Tank panel and enter the capacity next to each tank name.
+- Tanks are drawn with a width proportional to their capacity. All tanks share the same fill height,
+  the amount per tank is fill level × capacity (e.g. 2400 / 2200 / 2200 L at 50 % → 1200 / 1100 / 1100 L).
+- The total capacity is the sum of all tanks. Chips, forecast, warning levels and the automation use it.
+- YAML: `tank_diff_capacity: true` and `capacity` per entry in `entities`:
+  ```yaml
+  tank_count: 3
+  tank_capacity: 2200
+  tank_diff_capacity: true
+  entities:
+    - name: Main tank
+      capacity: 2400
+    - name: Tank 2
+      capacity: 2200
+    - name: Tank 3
+      capacity: 2200
+  ```
+
+### Improved
+- Editor: number of tanks and capacity share one row (50 / 50), also on small screens.
+- Capsule shape: the glass highlights are now calculated per tank.
+- Editor performance: while typing or dragging a slider, the preview updates after a short pause,
+  and form fields are no longer rebuilt unnecessarily.
+
+### Notes
+- Existing configurations are unchanged. Without the switch, `tank_capacity` applies to all tanks as before.
+- Turning the switch off keeps the per-tank values in the config, but they are ignored.
+- Capacities only change the width of the tanks. Different tank heights are not part of this release.
+
+---
+
 ## [0.9.6] - 2026-10-29
 
 ### Changed
