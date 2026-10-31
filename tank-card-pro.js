@@ -516,7 +516,7 @@ ha-card[tabindex]:focus-visible{outline:2px solid var(--primary-color);outline-o
 .chip span:first-child{opacity:.7;font-weight:500;flex:none}
 .tanks{position:relative;flex:1;display:flex;column-gap:clamp(3px,calc(8% / var(--n,3)),24px);min-height:150px;padding:0 1%}
 .t{position:relative;z-index:1;isolation:isolate;flex:1;min-width:0;display:flex;flex-direction:column;padding-bottom:16px;container-type:inline-size}
-.dc .t{flex-grow:var(--cap,1)}
+.dc .t{flex-grow:var(--cap,1);min-width:min(3.5em,calc(60% / var(--n,3)))}
 .t::after{content:"";position:absolute;z-index:-1;left:-6%;right:-6%;bottom:0;height:24px;background:radial-gradient(ellipse at 50% 40%,rgba(0,0,0,.55),transparent 70%);filter:blur(2px)}
 .n{text-align:center;font-weight:500;line-height:1.2;font-size:max(.3em,min(1.1em,calc(72cqw/(var(--lc,8)*.62))));margin-bottom:.3em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .v{position:relative;z-index:1;flex:1;min-height:100px;overflow:hidden;border-radius:var(--rad);background:linear-gradient(90deg,rgba(255,255,255,.2),rgba(255,255,255,.03) 28%,rgba(255,255,255,.03) 70%,rgba(0,0,0,.25)),rgba(120,130,140,.18);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35),inset 0 -14px 22px rgba(0,0,0,.4),inset 0 10px 18px rgba(255,255,255,.1)}
@@ -1045,7 +1045,7 @@ class TankCard extends HTMLElement {
       card.setAttribute("role", "button");
       card.addEventListener("click", tap);
       card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
-    }
+    } else card.setAttribute("role", "group");
     if (o.showTitle) card.append(el("div", "title", o.title));
     const info = {}, bar = el("div", "info");
     for (const i of o.order) {
@@ -1135,6 +1135,8 @@ class TankCard extends HTMLElement {
         for (const [k, v] of Object.entries(th)) if (typeof v === "string") { const n = k.startsWith("--") ? k : "--" + k; cs.setProperty(n, v); this._tv.push(n); }
       }
     }
+    const al = [o.title, fm.fill, fm.level, bad && tr(lg, bad)].filter(Boolean).join(", ");
+    if (this._els.card._al !== al) { this._els.card._al = al; this._els.card.setAttribute("aria-label", al); }
     cs.setProperty("--vc", vt.length || 6);
     if (vts) cs.setProperty("--vc", Math.max(...vts.map((x) => x.length)) || 6);
     const names = this._els.tanks.map((_, i) => o.names[i] ?? `${o.label ?? tr(lg, "u_tank")} ${i + 1}`);
@@ -1172,13 +1174,7 @@ class TankCardEditor extends HTMLElement {
     if (changed) this._sync();
     else this._f.forEach((x) => { if (x.live) x.form.hass = h; });
   }
-  _flush() {
-    if (!this._pt) return;
-    clearTimeout(this._pt);
-    this._go?.();
-  }
   setConfig(c) {
-    // Pending input: the config handed back is older than ours. Same config as the last one we sent: nothing to redo.
     if (this._pt) return;
     const cj = JSON.stringify(c || {});
     if (this._f && cj === this._cj) return;
@@ -1324,9 +1320,9 @@ class TankCardEditor extends HTMLElement {
       form.computeLabel = (s) => (s.name === "consumption_sensor" || s.name === "level_sensor" || s.name === "warn_time" ? "" : s.name.startsWith("tank_name_") ? tpl(tr(lang(this._hass), "tank_name"), { n: s.name.slice(10) }) : s.name.startsWith("tank_cap_") ? tr(lang(this._hass), "tank_cap") : tr(lang(this._hass), s.name));
       form.computeHelper = (s) => this._help(s);
       form.addEventListener("value-changed", (e) => { e.stopPropagation(); this._changed(e.detail?.value); });
+      form.addEventListener("input", (e) => this._live(e));
       form.addEventListener("input", () => { this._ty = performance.now(); }, true);
       form.addEventListener("focusout", () => this._flush());
-      form.addEventListener("input", (e) => this._live(e));
       if (id === "warn" || id === "w2") form.addEventListener("focusout", () => this._warnBlur());
       if (["d_h", "d_fs", "animation", "anim_b"].includes(id)) form.addEventListener("focusout", () => this._rangeBlur());
       parent.append(form);
@@ -1492,14 +1488,13 @@ class TankCardEditor extends HTMLElement {
     this._shown = d.initial_fill;
     this._shownAmt = d.refill_to_amount;
     this._tankSchema(sc, d);
-    this._f.forEach(({ id, form }) => {
-      form.hass = this._hass;
-      form.data = d;
-      // Only hand over a changed schema: a new schema makes ha-form rebuild all its fields
+    // Unchanged schemas keep their old array, so ha-form does not rebuild its fields
+    this._scc ||= {};
+    for (const id in sc) {
       const sj = JSON.stringify(sc[id]);
-      if (form._sj !== sj) { form._sj = sj; form.schema = sc[id]; }
-      form.hidden = !sc[id].length;
-    });
+      if (this._scc[id]?.j === sj) sc[id] = this._scc[id].s; else this._scc[id] = { j: sj, s: sc[id] };
+    }
+    this._f.forEach(({ id, form }) => { form.hass = this._hass; form.data = d; form.schema = sc[id]; form.hidden = !sc[id].length; });
     const sm = tr(lg, "o_" + d.sensor_mode);
     this._q.forEach(([h, k]) => { h.textContent = tpl(tr(lg, k), { m: lg === "en" ? sm[0].toLowerCase() + sm.slice(1) : sm }); });
     this._gn.replaceChildren(el("div", "", tr(lg, "i_gas")), el("div", "b", tr(lg, "i_gas_on")));
@@ -1539,6 +1534,16 @@ class TankCardEditor extends HTMLElement {
     if (!blank("warn_2_level") && b !== l2) p.warn_2_level = b;
     return Object.keys(p).length ? p : null;
   }
+  _flush() {
+    if (!this._pt) return;
+    clearTimeout(this._pt);
+    this._pt = null;
+    const a = this._pa;
+    this._pa = null;
+    if (!a) return;
+    this._fl = true;
+    try { this._changed(...a); } finally { this._fl = false; }
+  }
   _rangeBlur() {
     // A number box may be empty or out of range while typing: it is corrected (or reset to the default) when the focus leaves
     const d = this._data(), p = {};
@@ -1551,6 +1556,13 @@ class TankCardEditor extends HTMLElement {
   }
   _changed(value, fixed, imp) {
     if (!value || typeof value !== "object") return;
+    // While typing or dragging a slider, the change is applied after a short pause (or when the field loses focus)
+    if (!this._fl && this._ty && performance.now() - this._ty < 100) {
+      this._pa = [value, fixed, imp];
+      clearTimeout(this._pt);
+      this._pt = setTimeout(() => this._flush(), 300);
+      return;
+    }
     const next = { ...value }, reset = [];
     const cp = [];
     for (let i = 1; i <= 20; i++) {
@@ -1635,26 +1647,17 @@ class TankCardEditor extends HTMLElement {
     for (const k in next) if (k in DEF && JSON.stringify(next[k]) === JSON.stringify(DEF[k]) && !(keep.includes(k) && next[k] === true)) delete next[k];
     const out = sortCfg(next);
     this._c = out;
+    this._cj = JSON.stringify(out);
     this._info = "";
-    // While typing (or dragging a slider) the preview and the form are updated only after a short pause
-    const typing = !!this._ty && performance.now() - this._ty < 100;
-    if (this._rs) reset.push(...this._rs);
-    this._rs = reset;
-    const go = () => {
-      this._pt = this._go = this._rs = null;
-      this._cj = JSON.stringify(this._c);
-      this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: this._c }, bubbles: true, composed: true }));
-      this._sync();
-      this._need();
-      if (reset.length) {
-        const e = Object.fromEntries(reset.map((k) => [k, undefined]));
-        this._f.forEach(({ form }) => { form.data = { ...this._data(), ...e }; });
-        clearTimeout(this._t);
-        this._t = setTimeout(() => { this._t = null; this._f?.forEach(({ form }) => { form.data = this._data(); }); }, 40);
-      }
-    };
-    clearTimeout(this._pt);
-    if (typing) { this._go = go; this._pt = setTimeout(go, 300); } else go();
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: out }, bubbles: true, composed: true }));
+    this._sync();
+    this._need();
+    if (reset.length) {
+      const e = Object.fromEntries(reset.map((k) => [k, undefined]));
+      this._f.forEach(({ form }) => { form.data = { ...this._data(), ...e }; });
+      clearTimeout(this._t);
+      this._t = setTimeout(() => { this._t = null; this._f?.forEach(({ form }) => { form.data = this._data(); }); }, 40);
+    }
   }
 }
 if (!customElements.get("tank-card-pro")) customElements.define("tank-card-pro", TankCard);
