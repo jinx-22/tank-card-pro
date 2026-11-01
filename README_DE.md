@@ -27,6 +27,8 @@
 - Kapsel-Form: Die Glanzpunkte werden pro Tank berechnet.
 - Editor-Performance: Beim Tippen und Ziehen von Schiebereglern aktualisiert sich die Vorschau nach einer kurzen Pause,
   und Formularfelder werden nicht mehr unnötig neu aufgebaut.
+- Tanks mit stark unterschiedlichen Kapazitäten behalten eine Mindestbreite, damit Name und Menge lesbar bleiben (sonst ist die Breite weiter proportional).
+- Barrierefreiheit: Bildschirmleser lesen Titel, Füllstand, Menge und eine mögliche Warnung der Karte vor.
 
 ### Hinweise
 - Bestehende Konfigurationen bleiben unverändert. Ohne Schalter gilt `tank_capacity` wie bisher für alle Tanks.
@@ -54,6 +56,7 @@ Die Berechnung hängt vom gewählten Sensormodus ab:
 ### Highlights
 
 - Ein oder mehrere Tanks (1–20) mit automatischer Nummerierung, gemeinsamer Beschriftung oder einzelnen Namen
+- Individuelle Kapazität pro Tank (die Tankbreite folgt der Kapazität)
 - Füllstand, Gesamtkapazität und Verbrauch auf einen Blick
 - Verbrauchs- und Füllstandssensoren (absolut oder prozentual)
 - Tankformen `rect`, `pool` und `capsule`
@@ -137,7 +140,8 @@ Alle nicht aufgeführten Optionen verwenden ihren Standardwert. Der visuelle Edi
 | `title`              | `Tank Card Pro`                   | string  | Kartentitel |
 | `show_title`         | `true`                       | boolean | Titel anzeigen |
 | `tank_count`         | `3`                          | number  | Anzahl der Tanks (1–20) |
-| `tank_capacity`      | `1500`                       | number  | Kapazität pro Tank (in der Mess-Einheit) |
+| `tank_capacity`      | `1500`                       | number  | Kapazität pro Tank (in der Mess-Einheit). Mit `tank_diff_capacity` der Standard für Tanks ohne eigene Kapazität |
+| `tank_diff_capacity` | `false`                      | boolean | Individuelle Kapazität pro Tank (nur ab 2 Tanks): `entities[].capacity`, Tanks ohne Wert verwenden `tank_capacity`. Die Tanks werden proportional zur Kapazität unterschiedlich breit dargestellt |
 | `initial_fill`       | `tank_count × tank_capacity` | number  | Anfangsfüllstand des Gesamtsystems (leer = voll) |
 | `sensor_mode`        | `consumption`                | string  | `consumption`, `fill_level_l` oder `fill_level_percent` |
 | `consumption_sensor` | `""`                         | string  | Verbrauchssensor (nur bei `consumption`) |
@@ -150,7 +154,7 @@ Alle nicht aufgeführten Optionen verwenden ihren Standardwert. Der visuelle Edi
 | `show_unittank`      | `true`                       | boolean | Menge pro Tank im Füllbalken anzeigen |
 | `show_tank_label`    | `true`                       | boolean | Tank-Beschriftung anzeigen |
 | `tank_label`         | `Tank`                       | string  | Gemeinsamer Name der Tanks (Nummerierung automatisch) |
-| `entities`           | –                            | list    | Einzelne Tank-Namen: pro Tank `- name: …` (erster Eintrag = Tank 1). Tanks ohne Namen verwenden `tank_label` + Nummer (im Editor ein Eingabefeld pro Tank) |
+| `entities`           | –                            | list    | Einzelne Tank-Namen: pro Tank `- name: …` (erster Eintrag = Tank 1). Tanks ohne Namen verwenden `tank_label` + Nummer (im Editor ein Eingabefeld pro Tank). Mit `tank_diff_capacity: true` kann jeder Eintrag zusätzlich `capacity: …` enthalten |
 | `show_max`           | `true`                       | boolean | „Max:“ anzeigen |
 | `show_current`       | `true`                       | boolean | „Aktuell:“ anzeigen |
 | `show_fill_level`    | `true`                       | boolean | „Füllstand:“ anzeigen |
@@ -235,6 +239,8 @@ Sensorwert (0–100 %) wird auf die Gesamtkapazität bezogen:
 
 `total_capacity = tank_count × tank_capacity`  
 `current_level = total_capacity × percentage / 100`
+
+Mit `tank_diff_capacity: true` ist die Gesamtkapazität die Summe der einzelnen Tank-Kapazitäten.
 
 Ist der gewählte Sensor nicht verfügbar, zeigt die Karte den letzten bekannten Wert (oder den Anfangsbestand) zusammen mit dem Warnschild **Sensor nicht verfügbar**. Ohne gewählten Sensor zeigen die Tanks den Anfangsbestand.
 
