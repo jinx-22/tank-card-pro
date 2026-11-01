@@ -2,7 +2,7 @@
 
 All notable changes to **Tank Card Pro** are documented in this file.
 
-## [0.9.7] - 2026-10-30
+## [0.9.7] - 2026-10-31
 
 ### New
 - **Individual tank capacities** (Discussion #8): in multi-tank setups every tank can now have its own capacity.
@@ -29,12 +29,13 @@ All notable changes to **Tank Card Pro** are documented in this file.
 - Capsule shape: the glass highlights are now calculated per tank.
 - Editor performance: while typing or dragging a slider, the preview updates after a short pause,
   and form fields are no longer rebuilt unnecessarily.
+- Tanks with very different capacities keep a minimum width so that name and amount stay readable (otherwise the width stays proportional).
+- Accessibility: screen readers now read the title, the fill level, the amount and a possible warning of the card.
 
 ### Notes
 - Existing configurations are unchanged. Without the switch, `tank_capacity` applies to all tanks as before.
 - Turning the switch off keeps the per-tank values in the config, but they are ignored.
 - Capacities only change the width of the tanks. Different tank heights are not part of this release.
-
 ---
 
 ## [0.9.6] - 2026-10-29
