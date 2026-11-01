@@ -29,9 +29,9 @@
     - name: Main tank
       capacity: 2400
     - name: Tank 2
-      capacity: 2200
+      capacity: 2000
     - name: Tank 3
-      capacity: 2200
+      capacity: 1800
   ```
 
 ### Improved
@@ -39,6 +39,8 @@
 - Capsule shape: the glass highlights are now calculated per tank.
 - Editor performance: while typing or dragging a slider, the preview updates after a short pause,
   and form fields are no longer rebuilt unnecessarily.
+- Tanks with very different capacities keep a minimum width so that name and amount stay readable (otherwise the width stays proportional).
+- Accessibility: screen readers now read the title, the fill level, the amount and a possible warning of the card.
 
 ### Notes
 - Existing configurations are unchanged. Without the switch, `tank_capacity` applies to all tanks as before.
@@ -66,6 +68,7 @@ The calculation depends on the selected sensor mode:
 ### Highlights
 
 - One or several tanks (1–20) with automatic numbering, a shared label or individual names
+- Individual capacity per tank (the tank width follows the capacity)
 - Fill level, total capacity and consumption at a glance
 - Consumption and fill-level sensors (absolute or percentage)
 - Tank shapes `rect`, `pool` and `capsule`
@@ -149,7 +152,8 @@ All options that are not listed use their default value. The visual editor only 
 | `title`              | `Tank Card Pro`                   | string  | Card title |
 | `show_title`         | `true`                       | boolean | Show the title |
 | `tank_count`         | `3`                          | number  | Number of tanks (1–20) |
-| `tank_capacity`      | `1500`                       | number  | Capacity per tank (in the measuring unit) |
+| `tank_capacity`      | `1500`                       | number  | Capacity per tank (in the measuring unit). With `tank_diff_capacity` the default for tanks without their own capacity |
+| `tank_diff_capacity` | `false`                      | boolean | Individual capacity per tank (only with 2 or more tanks): `entities[].capacity`, tanks without a value use `tank_capacity`. The tanks are drawn with a width proportional to their capacity |
 | `initial_fill`       | `tank_count × tank_capacity` | number  | Initial fill of the whole system (empty = full) |
 | `sensor_mode`        | `consumption`                | string  | `consumption`, `fill_level_l` or `fill_level_percent` |
 | `consumption_sensor` | `""`                         | string  | Consumption sensor (only for `consumption`) |
@@ -162,7 +166,7 @@ All options that are not listed use their default value. The visual editor only 
 | `show_unittank`      | `true`                       | boolean | Show the amount per tank in the fill |
 | `show_tank_label`    | `true`                       | boolean | Show the tank label |
 | `tank_label`         | `Tank`                       | string  | Shared name of the tanks (numbering is added automatically) |
-| `entities`           | –                            | list    | Individual tank names: `- name: …` per tank (first entry = tank 1). Tanks without a name use `tank_label` + number (one input field per tank in the editor) |
+| `entities`           | –                            | list    | Individual tank names: `- name: …` per tank (first entry = tank 1). Tanks without a name use `tank_label` + number (one input field per tank in the editor). With `tank_diff_capacity: true` each entry can also contain `capacity: …` |
 | `show_max`           | `true`                       | boolean | Show “Max:” |
 | `show_current`       | `true`                       | boolean | Show “Current:” |
 | `show_fill_level`    | `true`                       | boolean | Show “Level:” |
@@ -247,6 +251,8 @@ The sensor value (0–100 %) refers to the total capacity:
 
 `total_capacity = tank_count × tank_capacity`  
 `current_level = total_capacity × percentage / 100`
+
+With `tank_diff_capacity: true` the total capacity is the sum of the individual tank capacities.
 
 If the selected sensor is unavailable, the card shows the last known value (or the initial fill) together with the warning sign **Sensor unavailable**. Without a selected sensor the tanks show the initial fill.
 
