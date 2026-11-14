@@ -1,6 +1,5 @@
 {
-  "name": "Tank Card Pro",
-  "filename": "tank-card-pro.js",
-  "homeassistant": "2026.08.0",
-  "render_readme": true
+  "name": "BTC Calc Card",
+  "render_readme": true,
+  "filename": "btc-calc-card.js"
 }
