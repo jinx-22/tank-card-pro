@@ -10,32 +10,42 @@
 
 **Tank Card Pro** is the extended edition of the free [Tank Card](https://github.com/jinx-22/tank-card) everything the basic card can do, plus the **advanced settings** (average and daily consumption, range forecasts, refill detection and costs).
 
-**Current version: 0.9.6**
+**Current version: 0.9.7**
 
-## 🆕 0.9.6
+## 🆕 0.9.7
 
-### Changed
-- Minor visual refinements and UI polish.
-- Improved consistency of the card's appearance.
+### New
+- **Individual tank capacities** (Discussion #8): in multi-tank setups every tank can now have its own capacity.
+  Turn on "Tanks with different capacities" in the Tank panel and enter the capacity next to each tank name.
+- Tanks are drawn with a width proportional to their capacity. All tanks share the same fill height,
+  the amount per tank is fill level × capacity (e.g. 2400 / 2200 / 2200 L at 50 % → 1200 / 1100 / 1100 L).
+- The total capacity is the sum of all tanks. Chips, forecast, warning levels and the automation use it.
+- YAML: `tank_diff_capacity: true` and `capacity` per entry in `entities`:
+  ```yaml
+  tank_count: 3
+  tank_capacity: 2200
+  tank_diff_capacity: true
+  entities:
+    - name: Main tank
+      capacity: 2400
+    - name: Tank 2
+      capacity: 2000
+    - name: Tank 3
+      capacity: 1800
+  ```
 
-### Fixed
-- Fixed minor bugs and visual inconsistencies.
-- General stability and rendering improvements.
+### Improved
+- Editor: number of tanks and capacity share one row (50 / 50), also on small screens.
+- Capsule shape: the glass highlights are now calculated per tank.
+- Editor performance: while typing or dragging a slider, the preview updates after a short pause,
+  and form fields are no longer rebuilt unnecessarily.
+- Tanks with very different capacities keep a minimum width so that name and amount stay readable (otherwise the width stays proportional).
+- Accessibility: screen readers now read the title, the fill level, the amount and a possible warning of the card.
 
-## 🆕 0.9.5
-
-- First release of **Tank Card Pro** with the **Advanced settings** panel: average consumption per day, consumption yesterday / today, linear and seasonal range, refill detection, cost of the consumption so far and cost of refilling – see [Advanced settings](#-advanced-settings)
-- The Pro badges use short texts (“Ø/day”, “Yesterday”, “Today”) and the currency symbol of your Home Assistant system (“€ so far”, “€ refill”)
-- The editor preview and the dashboard now look the same: the card uses a fixed base font (14 px / 20 px, scaled by `font_size`) instead of inheriting it from the surrounding dialog
-- Badges: labels are written out and only abbreviated when a badge is too narrow; the font then shrinks down to 0.4 em. Every badge is sized individually. With large fonts or narrow cards the badges switch to one column automatically
-- Badges appear in the **order in which you switch them on** (hint in the editor). Existing cards: switch a badge off and on again once to put it in order
-- Warning sign **Sensor unavailable** (only when a sensor is selected, never in the card picker); the card picker shows half-filled tanks
-- Individual tank names again via `entities[].name` – in the editor there is one input field per tank right below the number of tanks
-- Editor: dividers between all blocks, new order in the panels **Display** and **Content** (initial fill directly after the sensor), the number fields of the sliders (card height, font size, wave interval, bubbles) can be typed freely without jumping back, automatic correction of the warning levels, help texts fall back to English
-- The configuration stays tidy: default values are removed and the keys are sorted
-- Notification automation: no more time lock (a drop from level 1 to level 2 is always reported), the push message of the previous level is removed from the phone, exact interval for every number of hours, values are stored in the automation and can be read back into the editor, the unit in the message text is sanitized
-- Warning level 2 can no longer drop below 1 %
-- German editor: “Design” instead of “Theme”
+### Notes
+- Existing configurations are unchanged. Without the switch, `tank_capacity` applies to all tanks as before.
+- Turning the switch off keeps the per-tank values in the config, but they are ignored.
+- Capacities only change the width of the tanks. Different tank heights are not part of this release.
 
 <img width="40%" height="auto" alt="Pro" src="https://github.com/user-attachments/assets/e90c872a-9728-473e-aa07-b820dce7ac00" />
 
@@ -58,6 +68,7 @@ The calculation depends on the selected sensor mode:
 ### Highlights
 
 - One or several tanks (1–20) with automatic numbering, a shared label or individual names
+- Individual capacity per tank (the tank width follows the capacity)
 - Fill level, total capacity and consumption at a glance
 - Consumption and fill-level sensors (absolute or percentage)
 - Tank shapes `rect`, `pool` and `capsule`
@@ -78,12 +89,12 @@ The calculation depends on the selected sensor mode:
 
 # 📦 Installation
 
-## Easy installation → [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card-pro&category=plugin)
+## Easy installation → [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card-pro&category=plugin)
 
-## HACS
 
-1. Open **HACS**
-2. Select **Frontend**
+## HA Marketplace (HACS)
+
+1. Open **Setting -> Marketplace**
 3. Search for **Tank Card Pro**
 4. Install the card
 5. Reload Home Assistant or the browser
@@ -141,7 +152,8 @@ All options that are not listed use their default value. The visual editor only 
 | `title`              | `Tank Card Pro`                   | string  | Card title |
 | `show_title`         | `true`                       | boolean | Show the title |
 | `tank_count`         | `3`                          | number  | Number of tanks (1–20) |
-| `tank_capacity`      | `1500`                       | number  | Capacity per tank (in the measuring unit) |
+| `tank_capacity`      | `1500`                       | number  | Capacity per tank (in the measuring unit). With `tank_diff_capacity` the default for tanks without their own capacity |
+| `tank_diff_capacity` | `false`                      | boolean | Individual capacity per tank (only with 2 or more tanks): `entities[].capacity`, tanks without a value use `tank_capacity`. The tanks are drawn with a width proportional to their capacity |
 | `initial_fill`       | `tank_count × tank_capacity` | number  | Initial fill of the whole system (empty = full) |
 | `sensor_mode`        | `consumption`                | string  | `consumption`, `fill_level_l` or `fill_level_percent` |
 | `consumption_sensor` | `""`                         | string  | Consumption sensor (only for `consumption`) |
@@ -154,7 +166,7 @@ All options that are not listed use their default value. The visual editor only 
 | `show_unittank`      | `true`                       | boolean | Show the amount per tank in the fill |
 | `show_tank_label`    | `true`                       | boolean | Show the tank label |
 | `tank_label`         | `Tank`                       | string  | Shared name of the tanks (numbering is added automatically) |
-| `entities`           | –                            | list    | Individual tank names: `- name: …` per tank (first entry = tank 1). Tanks without a name use `tank_label` + number (one input field per tank in the editor) |
+| `entities`           | –                            | list    | Individual tank names: `- name: …` per tank (first entry = tank 1). Tanks without a name use `tank_label` + number (one input field per tank in the editor). With `tank_diff_capacity: true` each entry can also contain `capacity: …` |
 | `show_max`           | `true`                       | boolean | Show “Max:” |
 | `show_current`       | `true`                       | boolean | Show “Current:” |
 | `show_fill_level`    | `true`                       | boolean | Show “Level:” |
@@ -239,6 +251,8 @@ The sensor value (0–100 %) refers to the total capacity:
 
 `total_capacity = tank_count × tank_capacity`  
 `current_level = total_capacity × percentage / 100`
+
+With `tank_diff_capacity: true` the total capacity is the sum of the individual tank capacities.
 
 If the selected sensor is unavailable, the card shows the last known value (or the initial fill) together with the warning sign **Sensor unavailable**. Without a selected sensor the tanks show the initial fill.
 

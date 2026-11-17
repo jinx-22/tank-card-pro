@@ -10,32 +10,30 @@
 
 **Tank Card Pro** ist die erweiterte Ausgabe der kostenlosen [Tank Card](https://github.com/jinx-22/tank-card) Alles, was die einfache Karte kann, plus die **erweiterten Einstellungen** (Durchschnitts- und Tagesverbrauch, Reichweite, Nachfüllerkennung und Kosten).
 
-**Aktuelle Version: 0.9.6**
+**Aktuelle Version: 0.9.7**
 
-## 🆕 0.9.6
+## 🆕 0.9.7
 
-### Geändert
-- Kleinere optische Verbesserungen und Feinschliff der Benutzeroberfläche.
-- Einheitlicheres Erscheinungsbild der Karte.
+### Neu
+- **Individuelle Tank-Kapazitäten** (Discussion #8): Bei mehreren Tanks kann jeder Tank eine eigene Kapazität haben.
+  Im Panel "Tank" den Schalter "Tanks mit unterschiedlichen Kapazitäten" einschalten und die Kapazität bei den Tanknamen eingeben.
+- Die Tanks werden proportional zur Kapazität unterschiedlich breit dargestellt, alle mit gleicher Füllhöhe.
+  Die Menge pro Tank ist Füllstand × Kapazität (z. B. 2400 / 2200 / 2200 L bei 50 % → 1200 / 1100 / 1100 L).
+- Die Gesamtkapazität ist die Summe aller Tanks. Chips, Prognose, Warnstufen und Automation rechnen damit.
+- YAML: `tank_diff_capacity: true` und `capacity` je Eintrag in `entities`.
 
-### Behoben
-- Kleinere Fehler und optische Unstimmigkeiten behoben.
-- Allgemeine Verbesserungen der Stabilität und Darstellung.
+### Verbessert
+- Editor: Anzahl und Kapazität stehen in einer Zeile (50 / 50), auch auf kleinen Bildschirmen.
+- Kapsel-Form: Die Glanzpunkte werden pro Tank berechnet.
+- Editor-Performance: Beim Tippen und Ziehen von Schiebereglern aktualisiert sich die Vorschau nach einer kurzen Pause,
+  und Formularfelder werden nicht mehr unnötig neu aufgebaut.
+- Tanks mit stark unterschiedlichen Kapazitäten behalten eine Mindestbreite, damit Name und Menge lesbar bleiben (sonst ist die Breite weiter proportional).
+- Barrierefreiheit: Bildschirmleser lesen Titel, Füllstand, Menge und eine mögliche Warnung der Karte vor.
 
-## 🆕 0.9.5
-
-- Erste Version der **Tank Card Pro** mit dem Bereich **Erweiterte Einstellungen**: Durchschnittsverbrauch pro Tag, Verbrauch gestern / heute, lineare und saisonale Reichweite, Nachfüllerkennung, Kosten des bisherigen Verbrauchs und Kosten der Neubefüllung – siehe [Erweiterte Einstellungen](#-erweiterte-einstellungen)
-- Die Pro-Schilder haben kurze Texte („Ø/Tag“, „Gestern“, „Heute“) und nutzen das Währungszeichen deines Home-Assistant-Systems („€ bisher“, „€ Füllung“)
-- Editor-Vorschau und Dashboard sehen jetzt gleich aus: Die Karte nutzt eine feste Basisschrift (14 px / 20 px, skaliert mit `font_size`), statt sie vom umgebenden Dialog zu erben
-- Schilder (Badges): Die Bezeichnungen werden ausgeschrieben und nur bei Platzmangel abgekürzt, danach wird die Schrift bis auf 0,4 em verkleinert. Jedes Schild wird einzeln angepasst. Bei großer Schrift oder schmaler Karte schalten die Schilder automatisch auf eine Spalte um
-- Die Schilder erscheinen in der **Reihenfolge, in der du sie aktivierst** (Hinweis im Editor). Bestehende Karten: ein Schild einmal aus- und wieder einschalten, um es einzusortieren
-- Warnschild **Sensor nicht verfügbar** (nur bei gewähltem Sensor, nie im Karten-Picker); der Karten-Picker zeigt halbvolle Tanks
-- Einzelne Tank-Namen wieder über `entities[].name` – im Editor gibt es dafür direkt unter der Tank-Anzahl ein Eingabefeld pro Tank
-- Editor: Trennlinien zwischen allen Blöcken, neue Reihenfolge in den Bereichen **Anzeige** und **Inhalt** (Anfangsbestand direkt nach dem Sensor), die Zahlenfelder der Schieberegler (Kartenhöhe, Schriftgröße, Wellen-Intervall, Blasen) lassen sich frei eintippen, ohne zurückzuspringen, automatische Korrektur der Warnstufen, Hilfetexte fallen auf Englisch zurück
-- Die Konfiguration bleibt aufgeräumt: Standardwerte werden entfernt, die Schlüssel sind sortiert
-- Benachrichtigungs-Automation: keine Zeitsperre mehr (ein Rückgang von Stufe 1 auf Stufe 2 wird immer gemeldet), die Push-Nachricht der vorherigen Stufe wird auf dem Handy entfernt, exakter Abstand bei jeder Stundenzahl, die Werte werden in der Automation gespeichert und lassen sich in den Editor zurücklesen, die Einheit im Meldungstext wird bereinigt
-- Warnstufe 2 kann nicht mehr unter 1 % fallen
-- Deutscher Editor: „Design“ statt „Theme“
+### Hinweise
+- Bestehende Konfigurationen bleiben unverändert. Ohne Schalter gilt `tank_capacity` wie bisher für alle Tanks.
+- Beim Ausschalten bleiben die Einzelwerte in der Konfiguration erhalten, werden aber ignoriert.
+- Die Kapazitäten ändern nur die Breite der Tanks. Unterschiedliche Tankhöhen sind nicht Teil dieser Version.
 
 <img width="50%" height="auto" alt="Pro" src="https://github.com/user-attachments/assets/596e040d-042c-4bf0-8251-bf964e2c96dc" />
 
@@ -58,6 +56,7 @@ Die Berechnung hängt vom gewählten Sensormodus ab:
 ### Highlights
 
 - Ein oder mehrere Tanks (1–20) mit automatischer Nummerierung, gemeinsamer Beschriftung oder einzelnen Namen
+- Individuelle Kapazität pro Tank (die Tankbreite folgt der Kapazität)
 - Füllstand, Gesamtkapazität und Verbrauch auf einen Blick
 - Verbrauchs- und Füllstandssensoren (absolut oder prozentual)
 - Tankformen `rect`, `pool` und `capsule`
@@ -78,15 +77,14 @@ Die Berechnung hängt vom gewählten Sensormodus ab:
 
 # 📦 Installation
 
-## Einfache Installation → [Open in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card-pro&category=plugin)
+## Einfache Installation → [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jinx-22&repository=tank-card-pro&category=plugin)
 
-## HACS
+## HA Marketplace (HACS)
 
-1. **HACS** öffnen
-2. **Frontend** auswählen
-3. Nach **Tank Card Pro** suchen
-4. Karte installieren
-5. Home Assistant bzw. den Browser neu laden
+1. **Eintesllungen -> Marketplace** öffnen
+2. Nach **Tank Card Pro** suchen
+3. Karte installieren
+4. Home Assistant bzw. den Browser neu laden
 
 ## Manuell
 
@@ -141,7 +139,8 @@ Alle nicht aufgeführten Optionen verwenden ihren Standardwert. Der visuelle Edi
 | `title`              | `Tank Card Pro`                   | string  | Kartentitel |
 | `show_title`         | `true`                       | boolean | Titel anzeigen |
 | `tank_count`         | `3`                          | number  | Anzahl der Tanks (1–20) |
-| `tank_capacity`      | `1500`                       | number  | Kapazität pro Tank (in der Mess-Einheit) |
+| `tank_capacity`      | `1500`                       | number  | Kapazität pro Tank (in der Mess-Einheit). Mit `tank_diff_capacity` der Standard für Tanks ohne eigene Kapazität |
+| `tank_diff_capacity` | `false`                      | boolean | Individuelle Kapazität pro Tank (nur ab 2 Tanks): `entities[].capacity`, Tanks ohne Wert verwenden `tank_capacity`. Die Tanks werden proportional zur Kapazität unterschiedlich breit dargestellt |
 | `initial_fill`       | `tank_count × tank_capacity` | number  | Anfangsfüllstand des Gesamtsystems (leer = voll) |
 | `sensor_mode`        | `consumption`                | string  | `consumption`, `fill_level_l` oder `fill_level_percent` |
 | `consumption_sensor` | `""`                         | string  | Verbrauchssensor (nur bei `consumption`) |
@@ -154,7 +153,7 @@ Alle nicht aufgeführten Optionen verwenden ihren Standardwert. Der visuelle Edi
 | `show_unittank`      | `true`                       | boolean | Menge pro Tank im Füllbalken anzeigen |
 | `show_tank_label`    | `true`                       | boolean | Tank-Beschriftung anzeigen |
 | `tank_label`         | `Tank`                       | string  | Gemeinsamer Name der Tanks (Nummerierung automatisch) |
-| `entities`           | –                            | list    | Einzelne Tank-Namen: pro Tank `- name: …` (erster Eintrag = Tank 1). Tanks ohne Namen verwenden `tank_label` + Nummer (im Editor ein Eingabefeld pro Tank) |
+| `entities`           | –                            | list    | Einzelne Tank-Namen: pro Tank `- name: …` (erster Eintrag = Tank 1). Tanks ohne Namen verwenden `tank_label` + Nummer (im Editor ein Eingabefeld pro Tank). Mit `tank_diff_capacity: true` kann jeder Eintrag zusätzlich `capacity: …` enthalten |
 | `show_max`           | `true`                       | boolean | „Max:“ anzeigen |
 | `show_current`       | `true`                       | boolean | „Aktuell:“ anzeigen |
 | `show_fill_level`    | `true`                       | boolean | „Füllstand:“ anzeigen |
@@ -239,6 +238,8 @@ Sensorwert (0–100 %) wird auf die Gesamtkapazität bezogen:
 
 `total_capacity = tank_count × tank_capacity`  
 `current_level = total_capacity × percentage / 100`
+
+Mit `tank_diff_capacity: true` ist die Gesamtkapazität die Summe der einzelnen Tank-Kapazitäten.
 
 Ist der gewählte Sensor nicht verfügbar, zeigt die Karte den letzten bekannten Wert (oder den Anfangsbestand) zusammen mit dem Warnschild **Sensor nicht verfügbar**. Ohne gewählten Sensor zeigen die Tanks den Anfangsbestand.
 
